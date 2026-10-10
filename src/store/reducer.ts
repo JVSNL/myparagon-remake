@@ -64,6 +64,7 @@ export function reducer(state: AppState, action: Action): AppState {
         editedAt: null,
         deleted: false,
         likes: [],
+        lang: action.lang ?? 'nl',
       }
       return { ...state, comments: [...state.comments, comment] }
     }
@@ -72,7 +73,13 @@ export function reducer(state: AppState, action: Action): AppState {
       const comment = state.comments.find((c) => c.id === action.commentId)
       const text = action.text.trim()
       if (!comment || !text || !canEditComment(me, comment)) return state
-      return updateComment(state, comment.id, (c) => ({ ...c, text, editedAt: action.now }))
+      // Stored translations no longer match the new text.
+      return updateComment(state, comment.id, ({ translations: _stale, ...c }) => ({
+        ...c,
+        text,
+        editedAt: action.now,
+        lang: action.lang ?? c.lang,
+      }))
     }
 
     case 'deleteComment': {
@@ -135,6 +142,7 @@ export function reducer(state: AppState, action: Action): AppState {
         image: input.image,
         createdAt: action.now,
         reactions: {},
+        lang: input.lang ?? 'nl',
       }
       const notifications: AppNotification[] = state.users
         .filter((u) => u.id !== me.id)
@@ -326,7 +334,7 @@ export function reducer(state: AppState, action: Action): AppState {
       }
       if (!canEditContent(me) || !post || !content.title) return state
       const updated =
-        action.lang === 'nl'
+        action.lang === (post.lang ?? 'nl')
           ? { ...post, ...content, ...(action.image ? { image: action.image } : {}) }
           : { ...post, translations: { ...post.translations, [action.lang]: content } }
       return { ...state, posts: state.posts.map((p) => (p.id === post.id ? updated : p)) }
@@ -399,6 +407,8 @@ export function reducer(state: AppState, action: Action): AppState {
         editedAt: null,
         deleted: false,
         likes: [],
+        lang: 'nl',
+        ...(action.translations ? { translations: action.translations } : {}),
       }
       return {
         ...state,

@@ -54,8 +54,10 @@ export interface Post {
   image: ImageRef
   createdAt: number
   reactions: Reactions
-  /** Optional translations of title, intro and body; Dutch is the original. */
-  translations?: Partial<Record<Exclude<Lang, 'nl'>, PostContent>>
+  /** Language the post was written in; Dutch when absent. */
+  lang?: Lang
+  /** Translations of title, intro and body, keyed by language. */
+  translations?: Partial<Record<Lang, PostContent>>
 }
 
 export interface Comment {
@@ -69,6 +71,10 @@ export interface Comment {
   editedAt: number | null
   deleted: boolean
   likes: string[]
+  /** Language the comment was written in; Dutch when absent. */
+  lang?: Lang
+  /** Translations of the text, keyed by language. Cleared when the comment is edited. */
+  translations?: Partial<Record<Lang, string>>
 }
 
 export type NotificationType = 'new_post' | 'reply' | 'comment_like' | 'post_reaction' | 'question_answered'

@@ -19,12 +19,21 @@ const loadState = (): AppState => {
 
 const randomOf = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)]
 
-const COMMENT_REPLIES = [
-  'Helemaal mee eens! 👍',
-  'Goed punt, daar had ik nog niet zo naar gekeken.',
-  'Dank voor het delen!',
-  'Haha, herkenbaar 😄',
-  'Mooi gezegd. Laten we het er bij de koffie eens over hebben.',
+// Simulated colleagues write in Dutch; the translations stand in for a translation service.
+const COMMENT_REPLIES: { nl: string; en: string; de: string }[] = [
+  { nl: 'Helemaal mee eens! 👍', en: 'Totally agree! 👍', de: 'Sehe ich genauso! 👍' },
+  {
+    nl: 'Goed punt, daar had ik nog niet zo naar gekeken.',
+    en: 'Good point, I had not looked at it that way yet.',
+    de: 'Guter Punkt, so hatte ich das noch nicht gesehen.',
+  },
+  { nl: 'Dank voor het delen!', en: 'Thanks for sharing!', de: 'Danke fürs Teilen!' },
+  { nl: 'Haha, herkenbaar 😄', en: 'Haha, so relatable 😄', de: 'Haha, kenne ich 😄' },
+  {
+    nl: 'Mooi gezegd. Laten we het er bij de koffie eens over hebben.',
+    en: 'Well said. Let’s talk about it over coffee.',
+    de: 'Schön gesagt. Lass uns mal bei einem Kaffee darüber reden.',
+  },
 ]
 
 const CHAT_REPLIES = [
@@ -65,13 +74,14 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     finishOnboarding: () => dispatch({ type: 'finishOnboarding' }),
     restartOnboarding: () => dispatch({ type: 'restartOnboarding' }),
     toggleReaction: (postId: string, emoji: string) => dispatch({ type: 'toggleReaction', postId, emoji }),
-    addComment: (postId: string, text: string, parentId: string | null = null) => {
+    addComment: (postId: string, text: string, parentId: string | null = null, lang?: Lang) => {
       const id = newId('cm')
-      dispatch({ type: 'addComment', id, postId, parentId, text, now: Date.now() })
+      dispatch({ type: 'addComment', id, postId, parentId, text, now: Date.now(), lang })
       simulate.comment(id, parentId !== null)
       return id
     },
-    editComment: (commentId: string, text: string) => dispatch({ type: 'editComment', commentId, text, now: Date.now() }),
+    editComment: (commentId: string, text: string, lang?: Lang) =>
+      dispatch({ type: 'editComment', commentId, text, now: Date.now(), lang }),
     deleteComment: (commentId: string) => dispatch({ type: 'deleteComment', commentId }),
     toggleCommentLike: (commentId: string) => dispatch({ type: 'toggleCommentLike', commentId }),
     toggleBookmark: (postId: string) => dispatch({ type: 'toggleBookmark', postId }),
@@ -125,7 +135,7 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     },
     updatePost: (postId: string, lang: Lang, content: PostContent, image?: ImageRef) =>
       dispatch({ type: 'updatePost', postId, lang, content, image }),
-    removePostTranslation: (postId: string, lang: Exclude<Lang, 'nl'>) => dispatch({ type: 'removePostTranslation', postId, lang }),
+    removePostTranslation: (postId: string, lang: Lang) => dispatch({ type: 'removePostTranslation', postId, lang }),
     deletePost: (postId: string) => dispatch({ type: 'deletePost', postId }),
     setNotificationPrefs: (prefs: NotificationPrefs) => dispatch({ type: 'setNotificationPrefs', prefs }),
     sendFeedback: (topic: Feedback['topic'], text: string) =>
@@ -164,17 +174,19 @@ export function StoreProvider({ children, initialState }: { children: ReactNode;
           dispatch({ type: 'colleagueLikesComment', actorId: randomOf(pool), commentId, notificationId: newId('n'), now: Date.now() }),
         )
         if (isReply) return
-        later(9000, () =>
+        later(9000, () => {
+          const { nl, en, de } = randomOf(COMMENT_REPLIES)
           dispatch({
             type: 'colleagueReplies',
             actorId: randomOf(pool),
             parentId: commentId,
             id: newId('cm'),
-            text: randomOf(COMMENT_REPLIES),
+            text: nl,
+            translations: { en, de },
             notificationId: newId('n'),
             now: Date.now(),
-          }),
-        )
+          })
+        })
       },
       // Another member of the conversation starts typing and answers.
       chat: (conversationId) => {

@@ -45,14 +45,31 @@ src/
 - **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)
 - **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history; post translations; feedback inbox
 - **Search** across news, pages, colleagues, locations and FAQ
+- **Automatic translation**: posts and comments show in the reader's language, with "Show original" one tap away
+- Clickable names and avatars everywhere lead to profiles; colourful headers per section
 - Notifications centre with per-type settings, dark mode, NL/EN/DE interface, installable as an app (PWA)
 
 Simulated colleagues like and reply to your comments, answer in chats and the board answers questions,
 so the demo feels alive without a backend.
 
+## Translation
+
+Posts and comments remember the language they were written in. A reader whose app language differs sees:
+
+1. a stored translation, when there is one (all seed content ships with English and German);
+2. otherwise a machine translation, from the first available provider in `src/lib/translate.ts`:
+   - a translation endpoint, when `VITE_TRANSLATE_URL` is set at build time. The app sends
+     `POST { "source": "nl", "target": "de", "texts": ["…"] }` and expects `{ "texts": ["…"] }` back,
+     in the same order. A small serverless function (e.g. a Netlify Function) in front of DeepL,
+     Google or Azure Translator fits this contract and keeps the API key off the client;
+   - the on-device Translator API in recent Chrome and Edge;
+3. otherwise the original, labelled with its language.
+
+Readers can switch automatic translation off in Settings.
+
 ## Roadmap
 
-All six phases are built, one pull request each:
+All phases are built, one pull request each:
 
 1. Foundation — navigation, design system, demo login, welcome slides, news, reactions, comments, notifications
 2. Content pages, stories, locations, FAQ, PDF viewer
@@ -60,6 +77,8 @@ All six phases are built, one pull request each:
 4. Chat and Ask the Board
 5. Desktop editor, multilingual content, settings and feedback
 6. Global search and polish
+7. More colour and all-new, light content
+8. Automatic translation, clickable people, coloured headers
 
 Possible next steps: a real backend (the store's actions map one-to-one to API calls), push notifications,
 hosting on Netlify with previews per pull request.

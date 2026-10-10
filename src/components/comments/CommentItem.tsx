@@ -6,7 +6,9 @@ import { formatFull, formatRelative } from '../../lib/time'
 import { canDeleteComment, canEditComment } from '../../store/permissions'
 import { fullName, userById } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
-import { Avatar } from '../Avatar'
+import { AvatarLink, PersonLink } from '../PersonLink'
+import { TranslationNote } from '../TranslationNote'
+import { useTranslated } from '../../lib/useTranslated'
 import { ConfirmDialog } from '../ConfirmDialog'
 import { CommentForm } from './CommentForm'
 
@@ -29,6 +31,8 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
   const liked = !!me && comment.likes.includes(me.id)
   const canEdit = canEditComment(me, comment)
   const canDelete = canDeleteComment(me, comment)
+  const stored = comment.translations?.[locale]
+  const translation = useTranslated([comment.text], comment.lang ?? 'nl', stored ? [stored] : null)
 
   useEffect(() => {
     if (!menuOpen) return
@@ -51,7 +55,7 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
 
   return (
     <div id={`comment-${comment.id}`} className={`flex gap-3 rounded-xl ${highlighted ? 'bg-primary-soft/60 -m-2 p-2' : ''}`}>
-      {author && <Avatar user={author} size="md" />}
+      {author && <AvatarLink user={author} size="md" />}
       <div className="min-w-0 flex-1">
         {editing ? (
           <CommentForm
@@ -62,7 +66,7 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
             submitLabel={t('comments.save')}
             onCancel={() => setEditing(false)}
             onSubmit={(text) => {
-              actions.editComment(comment.id, text)
+              actions.editComment(comment.id, text, locale)
               setEditing(false)
             }}
           />
@@ -70,8 +74,8 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
           <>
             <div className="flex items-start justify-between gap-2">
               <div className="min-w-0 rounded-2xl rounded-tl-sm bg-surface-2 px-3.5 py-2.5">
-                <p className="text-sm font-medium text-heading">{name}</p>
-                <p className="text-[15px] break-words whitespace-pre-line text-text">{comment.text}</p>
+                <p className="text-sm font-medium text-heading">{author ? <PersonLink user={author} /> : name}</p>
+                <p className="text-[15px] break-words whitespace-pre-line text-text">{translation.texts[0]}</p>
               </div>
               {(canEdit || canDelete) && (
                 <div className="relative" ref={menuRef}>
@@ -154,6 +158,7 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
                 {formatRelative(comment.createdAt, now, locale)}
               </time>
               {comment.editedAt && <span>· {t('comments.edited')}</span>}
+              <TranslationNote translation={translation} compact />
             </div>
           </>
         )}

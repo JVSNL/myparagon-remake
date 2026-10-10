@@ -411,6 +411,21 @@ export const nl = {
   'role.employee': 'Medewerker',
   'role.editor': 'Redacteur',
   'role.admin': 'Beheerder',
+  'translate.from.nl': "Vertaald uit het Nederlands",
+  'translate.from.en': "Vertaald uit het Engels",
+  'translate.from.de': "Vertaald uit het Duits",
+  'translate.in.nl': "Origineel in het Nederlands",
+  'translate.in.en': "Origineel in het Engels",
+  'translate.in.de': "Origineel in het Duits",
+  'translate.machine': "automatisch",
+  'translate.pending': "Bezig met vertalen…",
+  'translate.showOriginal': "Toon origineel",
+  'translate.showTranslation': "Toon vertaling",
+  'settings.autoTranslate': "Berichten automatisch vertalen",
+  'settings.autoTranslateHint': "Toon berichten en reacties in de taal van de app.",
+  'editor.copyFromOriginal': "Kopieer vanuit origineel",
+  'postEdit.notTranslated': "Dit bericht is nog niet vertaald. Lezers met deze taal zien een automatische vertaling als die beschikbaar is, anders het origineel.",
+  'profile.open': "Bekijk het profiel van {name}",
 }
 
 export type MessageKey = keyof typeof nl

@@ -41,3 +41,9 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
 - Search lives in `src/lib/search.ts` (pure, tested). New content types should be added there too.
 - Editor actions (pages/posts) require `canEditContent`; drafts never show outside the editor.
 - Seed content is Dutch. Keep the seed deterministic (`src/lib/random.ts`).
+- Posts and comments carry their `lang`; show them through `usePostContent` / `useTranslated` so readers
+  get stored or machine translations (`src/lib/translate.ts`). New seed posts/comments need EN and DE
+  versions in `src/data/seed/translations.ts` (a test checks this).
+- Names and avatars of people link to their profile (`PersonLink` / `AvatarLink`).
+- Page headers take the colour of their section (`sectionColor` in `navItems.ts`); content on deep
+  brand colours uses the `.on-brand` token scope.

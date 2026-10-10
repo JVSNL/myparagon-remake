@@ -62,9 +62,9 @@ export const notificationsFor = (state: AppState, userId: string) => {
 
 export const unreadCount = (state: AppState, userId: string) => notificationsFor(state, userId).filter((n) => !n.read).length
 
-/** Title, intro and body in the requested language, falling back to the Dutch original. */
+/** Title, intro and body in the requested language, falling back to the original. */
 export const postContent = (post: Post, lang: Lang): PostContent =>
-  (lang !== 'nl' && post.translations?.[lang]) || { title: post.title, intro: post.intro, body: post.body }
+  (lang !== (post.lang ?? 'nl') && post.translations?.[lang]) || { title: post.title, intro: post.intro, body: post.body }
 
 export const isBookmarked = (state: AppState, userId: string, postId: string) =>
   (state.bookmarks[userId] ?? []).includes(postId)

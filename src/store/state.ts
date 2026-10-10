@@ -55,6 +55,8 @@ export interface NewPostInput {
   intro: string
   body: string[]
   image: ImageRef
+  /** Language the post is written in; Dutch when absent. */
+  lang?: Lang
 }
 
 /*
@@ -67,8 +69,8 @@ export type Action =
   | { type: 'finishOnboarding' }
   | { type: 'restartOnboarding' }
   | { type: 'toggleReaction'; postId: string; emoji: string }
-  | { type: 'addComment'; id: string; postId: string; parentId: string | null; text: string; now: number }
-  | { type: 'editComment'; commentId: string; text: string; now: number }
+  | { type: 'addComment'; id: string; postId: string; parentId: string | null; text: string; now: number; lang?: Lang }
+  | { type: 'editComment'; commentId: string; text: string; now: number; lang?: Lang }
   | { type: 'deleteComment'; commentId: string }
   | { type: 'toggleCommentLike'; commentId: string }
   | { type: 'toggleBookmark'; postId: string }
@@ -82,7 +84,9 @@ export type Action =
       actorId: string
       parentId: string
       id: string
+      /** Dutch text, with optional translations. */
       text: string
+      translations?: Comment['translations']
       notificationId: string
       now: number
     }
@@ -103,7 +107,7 @@ export type Action =
   | { type: 'restorePageVersion'; pageId: string; versionId: string }
   | { type: 'createPage'; id: string; slug: string; section: PageSection; title: string; now: number }
   | { type: 'updatePost'; postId: string; lang: Lang; content: PostContent; image?: ImageRef }
-  | { type: 'removePostTranslation'; postId: string; lang: Exclude<Lang, 'nl'> }
+  | { type: 'removePostTranslation'; postId: string; lang: Lang }
   | { type: 'deletePost'; postId: string }
   | { type: 'setNotificationPrefs'; prefs: NotificationPrefs }
   | { type: 'sendFeedback'; id: string; topic: Feedback['topic']; text: string; now: number }

@@ -3,12 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { fieldClass, ImagePicker } from '../components/ImagePicker'
 import { PageHeader } from '../components/layout/PageHeader'
 import type { ImageRef } from '../data/types'
-import { useT } from '../lib/preferences'
+import { usePreferences } from '../lib/preferences'
 import { canPublish } from '../store/permissions'
 import { useStore } from '../store/StoreProvider'
 
 export function ComposePage() {
-  const t = useT()
+  const { t, locale } = usePreferences()
   const { state, me, actions } = useStore()
   const navigate = useNavigate()
   const [channelId, setChannelId] = useState(state.channels[0]?.id ?? '')
@@ -40,6 +40,7 @@ export function ComposePage() {
       intro,
       body: body.split(/\n\s*\n/),
       image,
+      lang: locale,
     })
     navigate(`/news/${id}`, { replace: true })
   }

@@ -255,9 +255,50 @@ describe('post translations and deletion', () => {
     const post = () => state.posts.find((p) => p.id === 'p02')!
     expect(post().translations?.en).toEqual({ title: 'Hello', intro: 'Intro', body: ['One'] })
     expect(postContent(post(), 'en').title).toBe('Hello')
-    expect(postContent(post(), 'de').title).toBe(post().title)
     state = run(state, { type: 'removePostTranslation', postId: 'p02', lang: 'en' })
     expect(post().translations?.en).toBeUndefined()
+    expect(postContent(post(), 'en').title).toBe(post().title)
+  })
+
+  it('treats the language a post was written in as the original', () => {
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    const input = { channelId: 'c-company', title: 'Hallo zusammen', intro: '', body: ['Text'], image: { kind: 'artwork' as const, seed: 1, palette: 'navy' as const }, lang: 'de' as const }
+    let state = run(editor, { type: 'createPost', id: 'p-de', input, now: NOW })
+    const post = () => state.posts.find((p) => p.id === 'p-de')!
+    expect(post().lang).toBe('de')
+    expect(postContent(post(), 'de').title).toBe('Hallo zusammen')
+    // Saving the German version edits the original, saving Dutch adds a translation.
+    state = run(state, { type: 'updatePost', postId: 'p-de', lang: 'de', content: { title: 'Hallo alle', intro: '', body: ['Text'] } })
+    state = run(state, { type: 'updatePost', postId: 'p-de', lang: 'nl', content: { title: 'Hallo allemaal', intro: '', body: ['Tekst'] } })
+    expect(post().title).toBe('Hallo alle')
+    expect(post().translations?.nl?.title).toBe('Hallo allemaal')
+  })
+})
+
+describe('comment languages', () => {
+  it('records the language of a new comment and drops stale translations on edit', () => {
+    let state = run(signedIn(), { type: 'addComment', id: 'c-en', postId: 'p01', parentId: null, text: 'Great ride!', now: NOW, lang: 'en' })
+    expect(state.comments.find((c) => c.id === 'c-en')?.lang).toBe('en')
+
+    state = { ...state, comments: state.comments.map((c) => (c.id === 'c-en' ? { ...c, translations: { de: 'Tolle Tour!' } } : c)) }
+    state = run(state, { type: 'editComment', commentId: 'c-en', text: 'Mooie rit!', now: NOW, lang: 'nl' })
+    const edited = state.comments.find((c) => c.id === 'c-en')!
+    expect(edited.translations).toBeUndefined()
+    expect(edited.lang).toBe('nl')
+  })
+
+  it('keeps translations of simulated replies', () => {
+    const state = run(signedIn(), {
+      type: 'colleagueReplies',
+      actorId: 'u02',
+      parentId: 'cm1',
+      id: 'c-sim',
+      text: 'Dank voor het delen!',
+      translations: { en: 'Thanks for sharing!' },
+      notificationId: 'n-sim',
+      now: NOW,
+    })
+    expect(state.comments.find((c) => c.id === 'c-sim')?.translations?.en).toBe('Thanks for sharing!')
   })
 
   it('deletes a post with its comments', () => {

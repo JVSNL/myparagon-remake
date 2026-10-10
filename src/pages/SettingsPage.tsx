@@ -17,6 +17,9 @@ const THEMES: { value: ThemePref; icon: LucideIcon }[] = [
   { value: 'dark', icon: Moon },
 ]
 
+const SWITCH =
+  'relative h-7 w-12 shrink-0 rounded-full bg-border transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-focus after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5'
+
 function Segmented<T extends string>({
   label,
   value,
@@ -52,7 +55,7 @@ function Segmented<T extends string>({
 }
 
 export function SettingsPage() {
-  const { t, theme, setTheme, language, setLanguage } = usePreferences()
+  const { t, theme, setTheme, language, setLanguage, autoTranslate, setAutoTranslate } = usePreferences()
   const { state, me, actions } = useStore()
   const navigate = useNavigate()
   const [confirmReset, setConfirmReset] = useState(false)
@@ -89,6 +92,20 @@ export function SettingsPage() {
             options={languageOptions}
             className="grid-cols-2 sm:grid-cols-4"
           />
+          <label className="mt-2 flex cursor-pointer items-center justify-between gap-3 rounded-xl border border-border bg-surface px-4 py-3">
+            <span>
+              <span className="block text-[15px] text-text">{t('settings.autoTranslate')}</span>
+              <span className="block text-sm text-muted">{t('settings.autoTranslateHint')}</span>
+            </span>
+            <input
+              type="checkbox"
+              role="switch"
+              checked={autoTranslate}
+              onChange={(e) => setAutoTranslate(e.target.checked)}
+              className="peer sr-only"
+            />
+            <span aria-hidden="true" className={SWITCH} />
+          </label>
         </section>
 
         <section className="mb-6">
@@ -105,10 +122,7 @@ export function SettingsPage() {
                     onChange={(e) => actions.setNotificationPrefs({ ...prefs, [key]: e.target.checked })}
                     className="peer sr-only"
                   />
-                  <span
-                    aria-hidden="true"
-                    className="relative h-7 w-12 shrink-0 rounded-full bg-border transition-colors peer-checked:bg-primary peer-focus-visible:ring-2 peer-focus-visible:ring-focus after:absolute after:top-1 after:left-1 after:size-5 after:rounded-full after:bg-white after:shadow after:transition-transform peer-checked:after:translate-x-5"
-                  />
+                  <span aria-hidden="true" className={SWITCH} />
                 </label>
               </li>
             ))}
