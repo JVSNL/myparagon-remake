@@ -2,10 +2,6 @@ import type { MessageKey } from './nl'
 
 export const en: Record<MessageKey, string> = {
   'common.close': 'Close',
-  'compose.palette.navy': 'Dark blue',
-  'compose.palette.sky': 'Light blue',
-  'compose.palette.sage': 'Green',
-  'compose.palette.warm': 'Orange',
 
   'nav.home': 'Home',
   'nav.region': 'Region',
@@ -105,20 +101,17 @@ export const en: Record<MessageKey, string> = {
   'compose.body': 'Text',
   'compose.bodyHint': 'Leave an empty line between paragraphs.',
   'compose.artwork': 'Image',
-  'compose.shuffle': 'Other variant',
   'compose.publish': 'Publish',
   'compose.noRights': 'Only editors and administrators can publish posts.',
   'compose.required': 'Please enter at least a title.',
 
-  'compose.illustration': 'Illustration',
-  'compose.photo': 'Own photo',
   'compose.choosePhoto': 'Choose photo',
   'compose.changePhoto': 'Other photo',
   'compose.removePhoto': 'Remove photo',
   'compose.alt': 'Photo description',
   'compose.altHint': 'For colleagues who use a screen reader.',
   'compose.altRequired': 'Briefly describe what the photo shows.',
-  'compose.photoRequired': 'Choose a photo or use an illustration.',
+  'compose.photoRequired': 'Choose a photo for this post.',
   'compose.photoError': 'This photo could not be opened. Choose a JPG or PNG file.',
   'compose.photoTooLarge': 'This photo is larger than 20 MB. Choose a smaller one.',
   'compose.processing': 'Processing photo…',

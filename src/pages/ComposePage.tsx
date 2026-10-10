@@ -15,13 +15,9 @@ export function ComposePage() {
   const [title, setTitle] = useState('')
   const [intro, setIntro] = useState('')
   const [body, setBody] = useState('')
-  const [image, setImage] = useState<ImageRef>(() => ({
-    kind: 'artwork',
-    seed: Math.floor(Math.random() * 1000),
-    palette: 'navy',
-  }))
+  const [image, setImage] = useState<Extract<ImageRef, { kind: 'upload' }> | null>(null)
   const [error, setError] = useState(false)
-  const [altError, setAltError] = useState(false)
+  const [imageError, setImageError] = useState<'missing' | 'alt' | null>(null)
 
   if (!canPublish(me)) {
     return (
@@ -34,10 +30,10 @@ export function ComposePage() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    const missingAlt = image.kind === 'upload' && !image.alt.trim()
+    const problem = !image ? 'missing' : !image.alt.trim() ? 'alt' : null
     setError(!title.trim())
-    setAltError(missingAlt)
-    if (!title.trim() || missingAlt) return
+    setImageError(problem)
+    if (!title.trim() || !image || problem) return
     const id = actions.createPost({
       channelId,
       title,
@@ -126,9 +122,10 @@ export function ComposePage() {
           value={image}
           onChange={(next) => {
             setImage(next)
-            setAltError(false)
+            setImageError(null)
           }}
-          altError={altError ? t('compose.altRequired') : null}
+          missingError={imageError === 'missing' ? t('compose.photoRequired') : null}
+          altError={imageError === 'alt' ? t('compose.altRequired') : null}
         />
 
         <div className="flex justify-end pt-2">

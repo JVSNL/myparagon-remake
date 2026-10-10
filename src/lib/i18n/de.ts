@@ -2,10 +2,6 @@ import type { MessageKey } from './nl'
 
 export const de: Record<MessageKey, string> = {
   'common.close': 'Schließen',
-  'compose.palette.navy': 'Dunkelblau',
-  'compose.palette.sky': 'Hellblau',
-  'compose.palette.sage': 'Grün',
-  'compose.palette.warm': 'Orange',
 
   'nav.home': 'Start',
   'nav.region': 'Region',
@@ -105,20 +101,17 @@ export const de: Record<MessageKey, string> = {
   'compose.body': 'Text',
   'compose.bodyHint': 'Absätze mit einer Leerzeile trennen.',
   'compose.artwork': 'Bild',
-  'compose.shuffle': 'Andere Variante',
   'compose.publish': 'Veröffentlichen',
   'compose.noRights': 'Nur Redaktion und Administration können Beiträge veröffentlichen.',
   'compose.required': 'Bitte gib mindestens einen Titel ein.',
 
-  'compose.illustration': 'Illustration',
-  'compose.photo': 'Eigenes Foto',
   'compose.choosePhoto': 'Foto wählen',
   'compose.changePhoto': 'Anderes Foto',
   'compose.removePhoto': 'Foto entfernen',
   'compose.alt': 'Bildbeschreibung',
   'compose.altHint': 'Für Kolleginnen und Kollegen mit Screenreader.',
   'compose.altRequired': 'Beschreibe kurz, was auf dem Foto zu sehen ist.',
-  'compose.photoRequired': 'Wähle ein Foto oder nutze eine Illustration.',
+  'compose.photoRequired': 'Wähle ein Foto für diesen Beitrag.',
   'compose.photoError': 'Dieses Foto konnte nicht geöffnet werden. Wähle eine JPG- oder PNG-Datei.',
   'compose.photoTooLarge': 'Dieses Foto ist größer als 20 MB. Wähle ein kleineres.',
   'compose.processing': 'Foto wird verarbeitet…',
