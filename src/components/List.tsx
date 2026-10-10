@@ -1,6 +1,8 @@
 import { ChevronRight, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
+import type { ColorKey } from '../data/types'
+import { COLOR_CLASSES } from '../lib/colors'
 
 /** Grouped list in the style of iOS settings. */
 export function ListGroup({ title, children }: { title?: string; children: ReactNode }) {
@@ -20,13 +22,16 @@ interface RowProps {
   onClick?: () => void
   disabled?: boolean
   tone?: 'default' | 'danger'
+  /** Brand colour of the icon tile. */
+  color?: ColorKey
 }
 
-export function ListRow({ icon: Icon, label, detail, to, onClick, disabled, tone = 'default' }: RowProps) {
+export function ListRow({ icon: Icon, label, detail, to, onClick, disabled, tone = 'default', color = 'navy' }: RowProps) {
+  const c = COLOR_CLASSES[color]
   const content = (
     <>
       {Icon && (
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary-soft text-primary">
+        <span className={`flex size-8 shrink-0 items-center justify-center rounded-lg ${c.soft} ${c.text}`}>
           <Icon className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />
         </span>
       )}

@@ -1,4 +1,5 @@
 import { Bell, Bookmark, Globe, House, Info, Menu, Search, Settings, type LucideIcon } from 'lucide-react'
+import type { ColorKey } from '../../data/types'
 import type { MessageKey } from '../../lib/i18n/nl'
 
 export interface NavItem {
@@ -6,22 +7,24 @@ export interface NavItem {
   label: MessageKey
   icon: LucideIcon
   end?: boolean
+  /** Brand colour used when the item is active. */
+  color: ColorKey
 }
 
 /** Bottom tab bar on mobile. */
 export const TAB_ITEMS: NavItem[] = [
-  { to: '/', label: 'nav.home', icon: House, end: true },
-  { to: '/region', label: 'nav.region', icon: Globe },
-  { to: '/general', label: 'nav.general', icon: Info },
-  { to: '/menu', label: 'nav.menu', icon: Menu },
+  { to: '/', label: 'nav.home', icon: House, end: true, color: 'navy' },
+  { to: '/region', label: 'nav.region', icon: Globe, color: 'royal' },
+  { to: '/general', label: 'nav.general', icon: Info, color: 'sage' },
+  { to: '/menu', label: 'nav.menu', icon: Menu, color: 'orange' },
 ]
 
 /** Sidebar on desktop: the tabs plus what lives behind "Menu" on mobile. */
 export const SIDEBAR_ITEMS: NavItem[] = [
   TAB_ITEMS[0],
-  { to: '/search', label: 'search.title', icon: Search },
+  { to: '/search', label: 'search.title', icon: Search, color: 'sky' },
   ...TAB_ITEMS.slice(1),
-  { to: '/bookmarks', label: 'nav.bookmarks', icon: Bookmark },
-  { to: '/notifications', label: 'nav.notifications', icon: Bell },
-  { to: '/settings', label: 'nav.settings', icon: Settings },
+  { to: '/bookmarks', label: 'nav.bookmarks', icon: Bookmark, color: 'berry' },
+  { to: '/notifications', label: 'nav.notifications', icon: Bell, color: 'sienna' },
+  { to: '/settings', label: 'nav.settings', icon: Settings, color: 'navy' },
 ]

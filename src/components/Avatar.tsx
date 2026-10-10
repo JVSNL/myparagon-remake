@@ -4,7 +4,7 @@ import type { User } from '../data/types'
 import { PostImage } from './PostImage'
 
 // Light brand tints as backgrounds, so the illustrated faces stay readable.
-const BACKGROUNDS = ['dceefa', 'cfe3ef', 'f6e3c8', 'd6ebe2', 'ecdde6', 'efe6d4']
+const BACKGROUNDS = ['cde7f7', 'fbe0b8', 'cdeadf', 'f0d6e5', 'd3effb', 'f6d9c2', 'f7e7bd']
 
 const cache = new Map<string, string>()
 

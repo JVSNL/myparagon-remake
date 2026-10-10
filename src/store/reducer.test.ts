@@ -181,8 +181,8 @@ describe('profiles and regions', () => {
   })
 
   it('remembers the chosen region per user', () => {
-    const state = run(signedIn(), { type: 'chooseRegion', region: 'dach' })
-    expect(state.regionChoice[DEMO_ACCOUNTS.employee]).toBe('dach')
+    const state = run(signedIn(), { type: 'chooseRegion', region: 'nordics' })
+    expect(state.regionChoice[DEMO_ACCOUNTS.employee]).toBe('nordics')
   })
 })
 

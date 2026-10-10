@@ -36,7 +36,7 @@ export function ReactionChips({ post }: { post: Post }) {
               }}
               className={`flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-sm transition-colors ${
                 mine
-                  ? 'border-primary bg-primary-soft font-medium text-primary'
+                  ? 'border-c-orange bg-c-orange-soft font-medium text-c-orange-text'
                   : 'border-border bg-surface text-text hover:bg-surface-2'
               }`}
             >

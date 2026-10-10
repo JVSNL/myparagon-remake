@@ -54,7 +54,7 @@ export function NotificationsPage() {
               const post = n.postId ? state.posts.find((p) => p.id === n.postId) : undefined
               const question = n.questionId ? state.questions.find((q) => q.id === n.questionId) : undefined
               const href = question
-                ? `/ask-the-board#q-${question.id}`
+                ? `/ask#q-${question.id}`
                 : n.commentId
                   ? `/news/${n.postId}?comment=${n.commentId}`
                   : `/news/${n.postId}`

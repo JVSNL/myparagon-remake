@@ -10,16 +10,16 @@ describe('global search', () => {
   })
 
   it('finds news, pages, people, locations and FAQ', () => {
-    expect(search(state, 'zonnepanelen', 'nl').posts.map((p) => p.id)).toContain('p06')
+    expect(search(state, 'moestuin', 'nl').posts.map((p) => p.id)).toContain('p06')
     expect(search(state, 'finance', 'nl').pages.map((p) => p.slug)).toContain('finance')
     expect(search(state, 'sanne', 'nl').people.map((u) => u.firstName)).toContain('Sanne')
-    expect(search(state, 'keulen', 'nl').locations.map((l) => l.city)).toContain('Keulen')
+    expect(search(state, 'kopenhagen', 'nl').locations.map((l) => l.city)).toContain('Kopenhagen')
     expect(search(state, 'veilig', 'nl').faq.map((f) => f.question)).toContain('Is de app veilig?')
   })
 
   it('ignores accents and requires every word', () => {
-    expect(search(state, 'poznan', 'nl').locations.map((l) => l.city)).toContain('Poznań')
-    expect(search(state, 'zonnepanelen kerstmarkt', 'nl').total).toBe(0)
+    expect(search(state, 'malaga', 'nl').locations.map((l) => l.city)).toContain('Málaga')
+    expect(search(state, 'moestuin kerstmarkt', 'nl').total).toBe(0)
   })
 
   it('searches translated content in the reader’s language', () => {

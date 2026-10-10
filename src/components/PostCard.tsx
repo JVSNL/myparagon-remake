@@ -4,7 +4,8 @@ import type { Post } from '../data/types'
 import { usePreferences } from '../lib/preferences'
 import { formatFull, formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
-import { channelName, commentCount, postContent } from '../store/selectors'
+import { commentCount, postContent } from '../store/selectors'
+import { ChannelTag } from './ChannelTag'
 import { useStore } from '../store/StoreProvider'
 import { PostImage } from './PostImage'
 import { ReactionSummary } from './reactions/ReactionSummary'
@@ -21,8 +22,7 @@ export function PostCard({ post }: { post: Post }) {
       <PostImage image={post.image} className="aspect-[16/9] w-full" />
       <div className="p-4 sm:p-5">
         <p className="text-[13px] text-muted">
-          <span className="font-medium text-primary">{channelName(state, post.channelId)}</span>
-          <span aria-hidden="true"> · </span>
+          <ChannelTag channelId={post.channelId} className="mr-1.5" />
           <time dateTime={new Date(post.createdAt).toISOString()} title={formatFull(post.createdAt, locale)}>
             {formatRelative(post.createdAt, now, locale)}
           </time>

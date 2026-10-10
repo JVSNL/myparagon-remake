@@ -1,6 +1,6 @@
 export type Role = 'employee' | 'editor' | 'admin'
 
-export type CountryCode = 'NL' | 'BE' | 'DE' | 'PL' | 'CZ'
+export type CountryCode = 'NL' | 'BE' | 'DK' | 'ES'
 
 export interface User {
   id: string
@@ -21,9 +21,13 @@ export interface User {
   photo?: { kind: 'upload'; id: string; alt: string }
 }
 
+/** Categorical brand colours from the house style palette. */
+export type ColorKey = 'navy' | 'royal' | 'sky' | 'orange' | 'sienna' | 'sage' | 'berry'
+
 export interface Channel {
   id: string
   name: string
+  color: ColorKey
 }
 
 export type ArtworkPalette = 'navy' | 'sky' | 'warm' | 'sage'
@@ -113,7 +117,7 @@ export type Lang = 'nl' | 'en' | 'de'
 /** Content in Dutch, optionally translated. Missing translations fall back to Dutch. */
 export type Localized<T> = { nl: T } & Partial<Record<Exclude<Lang, 'nl'>, T>>
 
-export type RegionId = 'benelux' | 'dach' | 'cee'
+export type RegionId = 'benelux' | 'nordics' | 'iberia'
 
 export type Tone = ArtworkPalette
 
@@ -192,6 +196,6 @@ export interface Location {
   email: string
   description: string
   image: ImageRef
-  /** e.g. "Hoofdkantoor", "Fulfilmentcentrum" */
+  /** e.g. "Hoofdkantoor", "Flagshipstore" */
   kind: string
 }
