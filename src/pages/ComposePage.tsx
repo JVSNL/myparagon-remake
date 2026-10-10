@@ -1,17 +1,11 @@
-import { Shuffle } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Artwork } from '../components/Artwork'
+import { fieldClass, ImagePicker } from '../components/ImagePicker'
 import { PageHeader } from '../components/layout/PageHeader'
-import type { ArtworkPalette } from '../data/types'
+import type { ImageRef } from '../data/types'
 import { useT } from '../lib/preferences'
 import { canPublish } from '../store/permissions'
 import { useStore } from '../store/StoreProvider'
-
-const PALETTES: ArtworkPalette[] = ['navy', 'sky', 'sage', 'warm']
-
-const fieldClass =
-  'mt-1.5 block w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-[15px] text-text focus:border-focus focus:ring-1 focus:ring-focus focus:outline-none'
 
 export function ComposePage() {
   const t = useT()
@@ -21,9 +15,13 @@ export function ComposePage() {
   const [title, setTitle] = useState('')
   const [intro, setIntro] = useState('')
   const [body, setBody] = useState('')
-  const [palette, setPalette] = useState<ArtworkPalette>('navy')
-  const [seed, setSeed] = useState(() => Math.floor(Math.random() * 1000))
+  const [image, setImage] = useState<ImageRef>(() => ({
+    kind: 'artwork',
+    seed: Math.floor(Math.random() * 1000),
+    palette: 'navy',
+  }))
   const [error, setError] = useState(false)
+  const [altError, setAltError] = useState(false)
 
   if (!canPublish(me)) {
     return (
@@ -36,16 +34,16 @@ export function ComposePage() {
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
-    if (!title.trim()) {
-      setError(true)
-      return
-    }
+    const missingAlt = image.kind === 'upload' && !image.alt.trim()
+    setError(!title.trim())
+    setAltError(missingAlt)
+    if (!title.trim() || missingAlt) return
     const id = actions.createPost({
       channelId,
       title,
       intro,
       body: body.split(/\n\s*\n/),
-      artwork: { seed, palette },
+      image,
     })
     navigate(`/news/${id}`, { replace: true })
   }
@@ -123,37 +121,15 @@ export function ComposePage() {
           </p>
         </div>
 
-        <fieldset>
-          <legend className="text-sm font-medium text-heading">{t('compose.artwork')}</legend>
-          <Artwork artwork={{ seed, palette }} className="mt-1.5 aspect-[16/9] w-full rounded-xl" />
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {PALETTES.map((p) => (
-              <label key={p} className="cursor-pointer">
-                <input
-                  type="radio"
-                  name="palette"
-                  value={p}
-                  checked={palette === p}
-                  onChange={() => setPalette(p)}
-                  className="peer sr-only"
-                />
-                <span className="sr-only">{t(`compose.palette.${p}`)}</span>
-                <Artwork
-                  artwork={{ seed, palette: p }}
-                  className="block h-10 w-16 rounded-md ring-offset-2 ring-offset-bg peer-checked:ring-2 peer-checked:ring-primary peer-focus-visible:ring-2 peer-focus-visible:ring-focus"
-                />
-              </label>
-            ))}
-            <button
-              type="button"
-              onClick={() => setSeed((s) => s + 1)}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm font-medium text-primary hover:bg-surface-2"
-            >
-              <Shuffle className="size-4" aria-hidden="true" />
-              {t('compose.shuffle')}
-            </button>
-          </div>
-        </fieldset>
+        <ImagePicker
+          label={t('compose.artwork')}
+          value={image}
+          onChange={(next) => {
+            setImage(next)
+            setAltError(false)
+          }}
+          altError={altError ? t('compose.altRequired') : null}
+        />
 
         <div className="flex justify-end pt-2">
           <button

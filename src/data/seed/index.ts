@@ -3,7 +3,7 @@ import type { AppState } from '../../store/state'
 import { seedChannels, seedComments, seedPosts } from './posts'
 import { seedUsers } from './users'
 
-export const STATE_VERSION = 1
+export const STATE_VERSION = 2
 
 export const buildSeedState = (now: number): AppState => {
   const users = seedUsers()

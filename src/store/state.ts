@@ -1,4 +1,4 @@
-import type { AppNotification, Artwork, Channel, Comment, Post, User } from '../data/types'
+import type { AppNotification, ImageRef, Channel, Comment, Post, User } from '../data/types'
 
 export interface AppState {
   version: number
@@ -19,7 +19,7 @@ export interface NewPostInput {
   title: string
   intro: string
   body: string[]
-  artwork: Artwork
+  image: ImageRef
 }
 
 /*

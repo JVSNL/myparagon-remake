@@ -6,7 +6,7 @@ import { formatFull, formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
 import { channelName, commentCount } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
-import { Artwork } from './Artwork'
+import { PostImage } from './PostImage'
 import { ReactionSummary } from './reactions/ReactionSummary'
 
 export function PostCard({ post }: { post: Post }) {
@@ -17,7 +17,7 @@ export function PostCard({ post }: { post: Post }) {
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border bg-surface shadow-card transition-shadow hover:shadow-lg">
-      <Artwork artwork={post.artwork} className="aspect-[16/9] w-full" />
+      <PostImage image={post.image} className="aspect-[16/9] w-full" />
       <div className="p-4 sm:p-5">
         <p className="text-[13px] text-muted">
           <span className="font-medium text-primary">{channelName(state, post.channelId)}</span>

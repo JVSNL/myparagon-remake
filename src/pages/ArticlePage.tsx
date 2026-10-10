@@ -1,7 +1,7 @@
 import { Bookmark, MessageCircle, SmilePlus } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
-import { Artwork } from '../components/Artwork'
+import { PostImage } from '../components/PostImage'
 import { Avatar } from '../components/Avatar'
 import { CommentSection } from '../components/comments/CommentSection'
 import { PageHeader } from '../components/layout/PageHeader'
@@ -51,7 +51,7 @@ export function ArticlePage() {
     <>
       <PageHeader title={channelName(state, post.channelId)} backTo="/" />
       <article className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
-        <Artwork artwork={post.artwork} className="aspect-[16/9] w-full rounded-xl" />
+        <PostImage image={post.image} className="aspect-[16/9] w-full rounded-xl" />
 
         <p className="mt-5 text-sm font-medium text-primary">{channelName(state, post.channelId)}</p>
         <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{post.title}</h1>

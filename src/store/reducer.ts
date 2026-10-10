@@ -36,9 +36,14 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         posts: state.posts.map((p) => {
           if (p.id !== action.postId) return p
-          const users = toggle(p.reactions[action.emoji] ?? [], me.id)
-          const reactions = { ...p.reactions, [action.emoji]: users }
-          if (users.length === 0) delete reactions[action.emoji]
+          // One reaction per person: picking another emoji replaces it, the same one removes it.
+          const previous = Object.keys(p.reactions).find((e) => p.reactions[e].includes(me.id))
+          const reactions: typeof p.reactions = {}
+          for (const [emoji, users] of Object.entries(p.reactions)) {
+            const rest = users.filter((id) => id !== me.id)
+            if (rest.length > 0) reactions[emoji] = rest
+          }
+          if (previous !== action.emoji) reactions[action.emoji] = [...(reactions[action.emoji] ?? []), me.id]
           return { ...p, reactions }
         }),
       }
@@ -127,7 +132,7 @@ export function reducer(state: AppState, action: Action): AppState {
         title: input.title.trim(),
         intro: input.intro.trim(),
         body: input.body.map((p) => p.trim()).filter(Boolean),
-        artwork: input.artwork,
+        image: input.image,
         createdAt: action.now,
         reactions: {},
       }

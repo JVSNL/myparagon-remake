@@ -178,13 +178,15 @@ const HOUR = 3_600_000
 
 const seedReactions = (rand: () => number): Reactions => {
   const reactions: Reactions = {}
+  const reacted = new Set<string>()
   const count = 3 + Math.floor(rand() * 25)
   for (let i = 0; i < count; i++) {
-    // Weighted towards the first emojis, like real usage.
+    // Weighted towards the first emojis, like real usage; one reaction per person.
     const emoji = EMOJIS[Math.floor(rand() ** 2 * EMOJIS.length)]
     const user = userId(1 + Math.floor(rand() * 60))
-    const list = (reactions[emoji] ??= [])
-    if (!list.includes(user)) list.push(user)
+    if (reacted.has(user)) continue
+    reacted.add(user)
+    ;(reactions[emoji] ??= []).push(user)
   }
   return reactions
 }
@@ -198,7 +200,7 @@ export const seedPosts = (now: number): Post[] => {
     title: p.title,
     intro: p.intro,
     body: p.body,
-    artwork: { seed: 7 + i * 13, palette: p.palette },
+    image: { kind: 'artwork', seed: 7 + i * 13, palette: p.palette },
     createdAt: now - p.hoursAgo * HOUR,
     reactions: seedReactions(rand),
   }))

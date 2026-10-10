@@ -29,6 +29,13 @@ describe('seed', () => {
     expect(roles).toEqual(['employee', 'editor', 'admin'])
   })
 
+  it('has at most one reaction per person per post', () => {
+    for (const post of buildSeedState(NOW).posts) {
+      const all = Object.values(post.reactions).flat()
+      expect(new Set(all).size).toBe(all.length)
+    }
+  })
+
   it('only refers to existing users and posts', () => {
     const state = buildSeedState(NOW)
     const users = new Set(state.users.map((u) => u.id))
@@ -58,6 +65,19 @@ describe('session', () => {
 })
 
 describe('reactions', () => {
+  it('allows one reaction per person: another emoji replaces it', () => {
+    const me = DEMO_ACCOUNTS.employee
+    const state = run(
+      signedIn(),
+      { type: 'toggleReaction', postId: 'p02', emoji: '🦄' },
+      { type: 'toggleReaction', postId: 'p02', emoji: '🐙' },
+    )
+    const reactions = state.posts.find((p) => p.id === 'p02')!.reactions
+    expect(reactions['🦄']).toBeUndefined()
+    expect(reactions['🐙']).toEqual([me])
+    expect(Object.values(reactions).flat().filter((id) => id === me)).toHaveLength(1)
+  })
+
   it('toggles any emoji and removes empty entries', () => {
     const me = DEMO_ACCOUNTS.employee
     let state = run(signedIn(), { type: 'toggleReaction', postId: 'p02', emoji: '🦄' })
@@ -146,7 +166,7 @@ describe('publishing', () => {
     title: ' Nieuw ',
     intro: 'Intro',
     body: ['Alinea 1', ' ', 'Alinea 2'],
-    artwork: { seed: 1, palette: 'navy' as const },
+    image: { kind: 'artwork' as const, seed: 1, palette: 'navy' as const },
   }
 
   it('is not allowed for employees', () => {

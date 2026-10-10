@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, type ReactNode } from 'react'
 import { buildSeedState, STATE_VERSION } from '../data/seed'
 import type { User } from '../data/types'
+import { clearImages } from '../lib/imageStore'
 import { readJson, writeJson } from '../lib/storage'
 import { reducer } from './reducer'
 import type { Action, AppState, NewPostInput } from './state'
@@ -55,7 +56,10 @@ function createActions(dispatch: (a: Action) => void, simulate: (commentId: stri
       dispatch({ type: 'createPost', id, input, now: Date.now() })
       return id
     },
-    resetDemo: () => dispatch({ type: 'reset', state: buildSeedState(Date.now()) }),
+    resetDemo: () => {
+      void clearImages()
+      dispatch({ type: 'reset', state: buildSeedState(Date.now()) })
+    },
   }
 }
 

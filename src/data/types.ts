@@ -31,6 +31,9 @@ export interface Artwork {
   palette: ArtworkPalette
 }
 
+/** Either a generated illustration or a photo uploaded from the device (stored in IndexedDB). */
+export type ImageRef = ({ kind: 'artwork' } & Artwork) | { kind: 'upload'; id: string; alt: string }
+
 /** Emoji -> ids of the users who reacted with it. */
 export type Reactions = Record<string, string[]>
 
@@ -42,7 +45,7 @@ export interface Post {
   intro: string
   /** Body as plain paragraphs. */
   body: string[]
-  artwork: Artwork
+  image: ImageRef
   createdAt: number
   reactions: Reactions
 }
