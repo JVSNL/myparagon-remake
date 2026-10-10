@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { Avatar } from '../components/Avatar'
 import { PageHeader } from '../components/layout/PageHeader'
 import type { User } from '../data/types'
+import { COLOR_CLASSES, colorAt, colorFor } from '../lib/colors'
 import { useT } from '../lib/preferences'
 import { fullName } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
@@ -48,7 +49,7 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
   const team = state.users.filter((u) => u.managerId === user.id)
   const canEdit = me && (me.id === user.id || me.role === 'admin')
 
-  const action = 'flex flex-1 flex-col items-center gap-1 rounded-xl bg-primary-soft py-3 text-sm font-medium text-primary hover:opacity-90'
+  const action = 'flex flex-1 flex-col items-center gap-1 rounded-xl py-3 text-sm font-medium hover:opacity-90'
 
   return (
     <>
@@ -69,7 +70,12 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
       />
       <div className="mx-auto max-w-2xl px-4 pt-6 lg:pt-0">
         <div className="text-center">
-          <div className="inline-block">
+          {/* Banner in the colour of the person's department */}
+          <div className={`relative h-24 overflow-hidden rounded-2xl ${COLOR_CLASSES[colorFor(user.department)].solid}`} aria-hidden="true">
+            <span className="absolute -top-8 -left-6 size-24 rounded-full bg-white/20" />
+            <span className="absolute -right-4 -bottom-10 size-28 rounded-full bg-black/10" />
+          </div>
+          <div className="relative -mt-12 inline-block rounded-full bg-bg p-1.5">
             <Avatar user={user} size="xl" />
           </div>
           <h1 className="mt-3 text-2xl font-medium text-heading">{fullName(user)}</h1>
@@ -81,15 +87,15 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
 
         {me?.id !== user.id && (
           <div className="mt-5 flex gap-2">
-            <a href={`tel:${user.phone.replace(/\s/g, '')}`} className={action}>
+            <a href={`tel:${user.phone.replace(/\s/g, '')}`} className={`${action} bg-c-royal-soft text-c-royal-text`}>
               <Phone className="size-5" aria-hidden="true" />
               {t('profile.call')}
             </a>
-            <a href={`mailto:${user.email}`} className={action}>
+            <a href={`mailto:${user.email}`} className={`${action} bg-c-orange-soft text-c-orange-text`}>
               <Mail className="size-5" aria-hidden="true" />
               {t('profile.mail')}
             </a>
-            <Link to={`/chat/new?with=${user.id}`} className={action}>
+            <Link to={`/chat/new?with=${user.id}`} className={`${action} bg-c-sage-soft text-c-sage-text`}>
               <MessageCircle className="size-5" aria-hidden="true" />
               {t('profile.chat')}
             </Link>
@@ -118,8 +124,8 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
         {user.skills.length > 0 && (
           <Section title={t('profile.skills')}>
             <ul className="flex flex-wrap gap-2">
-              {user.skills.map((skill) => (
-                <li key={skill} className="rounded-full bg-primary-soft px-3 py-1 text-sm font-medium text-primary">
+              {user.skills.map((skill, i) => (
+                <li key={skill} className={`rounded-full px-3 py-1 text-sm font-medium ${COLOR_CLASSES[colorAt(i)].soft} ${COLOR_CLASSES[colorAt(i)].text}`}>
                   {skill}
                 </li>
               ))}

@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom'
+import { COLOR_CLASSES } from '../../lib/colors'
 import { useT } from '../../lib/preferences'
 import { useRegion } from '../../lib/useRegion'
 import { unreadChats } from '../../store/selectors'
@@ -16,14 +17,14 @@ export function TabBar() {
       className="pb-safe fixed inset-x-0 bottom-0 z-30 border-t border-border bg-surface/95 backdrop-blur lg:hidden"
     >
       <ul className="mx-auto grid max-w-2xl grid-cols-4">
-        {TAB_ITEMS.map(({ to, label, icon: Icon, end }) => (
+        {TAB_ITEMS.map(({ to, label, icon: Icon, end, color }) => (
           <li key={to}>
             <NavLink
               to={to}
               end={end}
               className={({ isActive }) =>
                 `flex h-16 flex-col items-center justify-center gap-1 text-xs font-medium transition-colors ${
-                  isActive ? 'text-primary' : 'text-muted hover:text-text'
+                  isActive ? COLOR_CLASSES[color].text : 'text-muted hover:text-text'
                 }`
               }
             >
@@ -31,7 +32,7 @@ export function TabBar() {
                 <>
                   <span
                     className={`relative flex h-7 w-12 items-center justify-center rounded-full transition-colors ${
-                      isActive ? 'bg-primary-soft' : ''
+                      isActive ? COLOR_CLASSES[color].soft : ''
                     }`}
                   >
                     <Icon className="size-5" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />

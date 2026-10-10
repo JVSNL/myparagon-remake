@@ -63,7 +63,7 @@ export function AppRoutes() {
         <Route path="chat" element={<ChatListPage />} />
         <Route path="chat/new" element={<NewChatPage />} />
         <Route path="chat/:conversationId" element={<ChatThreadPage />} />
-        <Route path="ask-the-board" element={<AskBoardPage />} />
+        <Route path="ask" element={<AskBoardPage />} />
         <Route path="general" element={<GeneralPage />} />
         <Route path="pages/:slug" element={<ContentPage />} />
         <Route path="stories" element={<StoriesPage />} />

@@ -12,7 +12,7 @@ import { readJson, writeJson } from '../lib/storage'
 import { fullName } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
-const SUGGESTIONS = ['Finance', 'zonnepanelen', 'Keulen', 'verlof', 'IT']
+const SUGGESTIONS = ['moestuin', 'Kopenhagen', 'fietsplan', 'verlof', 'Pip']
 
 /** Marks the query words in a text (case-insensitive). */
 function Highlight({ text, query }: { text: string; query: string }) {

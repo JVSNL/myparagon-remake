@@ -33,8 +33,13 @@ export function LoginPage() {
   const colleagues = [...state.users].sort((a, b) => a.lastName.localeCompare(b.lastName))
 
   return (
-    <main className="flex min-h-dvh items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md animate-fade-up">
+    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10">
+      {/* Decorative shapes in house-style colours */}
+      <span aria-hidden="true" className="absolute -top-24 -right-24 size-72 rounded-full bg-c-sky/30" />
+      <span aria-hidden="true" className="absolute top-40 -left-20 size-48 rounded-full bg-c-orange/25" />
+      <span aria-hidden="true" className="absolute -bottom-20 right-10 size-56 rounded-full bg-c-sage/20" />
+      <span aria-hidden="true" className="absolute bottom-32 -left-10 size-24 rounded-full bg-c-berry/20" />
+      <div className="relative w-full max-w-md animate-fade-up">
         <Logo className="mb-8" />
         <h1 className="text-3xl font-light text-heading">{t('login.title')}</h1>
         <p className="mt-2 text-muted">{t('login.subtitle')}</p>
@@ -52,7 +57,11 @@ export function LoginPage() {
                 >
                   <Avatar user={user} size="lg" />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-xs font-medium tracking-wide text-primary uppercase">
+                    <span
+                      className={`mb-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium tracking-wide uppercase ${
+                        { employee: 'bg-c-royal-soft text-c-royal-text', editor: 'bg-c-orange-soft text-c-orange-text', admin: 'bg-c-sage-soft text-c-sage-text' }[role]
+                      }`}
+                    >
                       {t(`login.role.${role}`)}
                     </span>
                     <span className="block font-medium text-heading">{fullName(user)}</span>

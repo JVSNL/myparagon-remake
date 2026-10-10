@@ -9,8 +9,8 @@ const byName = (first: string) => users.find((u) => u.firstName === first)!
 
 describe('Who is Who search', () => {
   it('matches name, role and skills, ignoring accents and case', () => {
-    expect(matchesQuery(byName('Ondřej'), 'ondrej')).toBe(true)
-    expect(matchesQuery(byName('Sanne'), 'financial analyst')).toBe(true)
+    expect(matchesQuery(byName('José'), 'jose')).toBe(true)
+    expect(matchesQuery(byName('Sanne'), 'product designer')).toBe(true)
     expect(matchesQuery(byName('Lukas'), 'typescript')).toBe(true)
     expect(matchesQuery(byName('Lukas'), 'payroll')).toBe(false)
   })
@@ -18,7 +18,7 @@ describe('Who is Who search', () => {
 
 describe('org chart', () => {
   it('builds the path from the top down to a person', () => {
-    expect(pathTo(users, 'u20')).toEqual(['u01', 'u02', 'u07', 'u08'])
+    expect(pathTo(users, 'u20')).toEqual(['u01', 'u35'])
     expect(pathTo(users, 'u01')).toEqual([])
   })
 
@@ -31,7 +31,7 @@ describe('org chart', () => {
 describe('regions', () => {
   it('maps countries to regions', () => {
     expect(regionOfCountry('BE')).toBe('benelux')
-    expect(regionOfCountry('DE')).toBe('dach')
-    expect(regionOfCountry('CZ')).toBe('cee')
+    expect(regionOfCountry('DK')).toBe('nordics')
+    expect(regionOfCountry('ES')).toBe('iberia')
   })
 })

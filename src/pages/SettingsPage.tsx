@@ -117,10 +117,10 @@ export function SettingsPage() {
 
         <ListGroup title={t('settings.account')}>
           <ListRow label={t('settings.loggedInAs', { name: fullName(me) })} detail={t(`role.${me.role}`)} />
-          <ListRow icon={UserRound} label={t('settings.profile')} to="/profile" />
-          {canEditContent(me) && <ListRow icon={LayoutDashboard} label={t('settings.admin')} to="/beheer" />}
+          <ListRow icon={UserRound} color="berry" label={t('settings.profile')} to="/profile" />
+          {canEditContent(me) && <ListRow icon={LayoutDashboard} color="royal" label={t('settings.admin')} to="/beheer" />}
           <ListRow
-            icon={Sparkles}
+            icon={Sparkles} color="orange"
             label={t('settings.showWelcome')}
             onClick={() => {
               actions.restartOnboarding()
@@ -128,7 +128,7 @@ export function SettingsPage() {
             }}
           />
           <ListRow
-            icon={LogOut}
+            icon={LogOut} color="navy"
             label={t('settings.logout')}
             onClick={() => {
               actions.logout()
@@ -138,11 +138,11 @@ export function SettingsPage() {
         </ListGroup>
 
         <ListGroup title={t('settings.about')}>
-          <ListRow icon={FileText} label={t('settings.legal')} to="/pages/legal" />
-          <ListRow icon={MessageSquareHeart} label={t('settings.feedback')} to="/feedback" />
-          <ListRow icon={Info} label={t('settings.version', { v: __APP_VERSION__ })} />
+          <ListRow icon={FileText} color="sky" label={t('settings.legal')} to="/pages/legal" />
+          <ListRow icon={MessageSquareHeart} color="sage" label={t('settings.feedback')} to="/feedback" />
+          <ListRow icon={Info} color="navy" label={t('settings.version', { v: __APP_VERSION__ })} />
           <ListRow
-            icon={RotateCcw}
+            icon={RotateCcw} color="sienna"
             label={t('settings.resetDemo')}
             tone="danger"
             onClick={() => setConfirmReset(true)}

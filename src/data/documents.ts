@@ -1,7 +1,7 @@
-import financeOrganogram from '../assets/docs/finance-organogram.pdf?url'
+import expenseProcess from '../assets/docs/expense-process.pdf?url'
 import houseRules from '../assets/docs/house-rules.pdf?url'
-import iso27001 from '../assets/docs/iso-27001.pdf?url'
-import purchaseProcess from '../assets/docs/purchase-process.pdf?url'
+import iso9001 from '../assets/docs/iso-9001.pdf?url'
+import travelPolicy from '../assets/docs/travel-policy.pdf?url'
 
 export interface DocumentInfo {
   id: string
@@ -13,10 +13,10 @@ export interface DocumentInfo {
 
 // Fictional example documents bundled with the app.
 export const DOCUMENTS: DocumentInfo[] = [
-  { id: 'finance-organogram', name: 'Finance_Organogram.pdf', url: financeOrganogram, size: 43_455 },
-  { id: 'purchase-process', name: 'Proces_inkoopfacturen.pdf', url: purchaseProcess, size: 44_491 },
-  { id: 'iso-27001', name: 'Certificaat_ISO_27001.pdf', url: iso27001, size: 38_212 },
-  { id: 'house-rules', name: 'Huisregels_kantoor.pdf', url: houseRules, size: 38_587 },
+  { id: 'expense-process', name: 'Declaraties_indienen.pdf', url: expenseProcess, size: 46_955 },
+  { id: 'travel-policy', name: 'Reisbeleid.pdf', url: travelPolicy, size: 37_919 },
+  { id: 'iso-9001', name: 'Certificaat_ISO_9001.pdf', url: iso9001, size: 38_439 },
+  { id: 'house-rules', name: 'Huisregels_kantoor.pdf', url: houseRules, size: 38_361 },
 ]
 
 export const documentById = (id: string) => DOCUMENTS.find((d) => d.id === id)

@@ -2,6 +2,7 @@ import { Bookmark, MessageCircle, Pencil, SmilePlus } from 'lucide-react'
 import { canEditContent } from '../store/permissions'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { ChannelTag } from '../components/ChannelTag'
 import { PostImage } from '../components/PostImage'
 import { Avatar } from '../components/Avatar'
 import { CommentSection } from '../components/comments/CommentSection'
@@ -69,7 +70,7 @@ export function ArticlePage() {
       <article className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
         <PostImage image={post.image} className="aspect-[16/9] w-full rounded-xl" />
 
-        <p className="mt-5 text-sm font-medium text-primary">{channelName(state, post.channelId)}</p>
+        <ChannelTag channelId={post.channelId} className="mt-5" />
         <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{content.title}</h1>
         {content.intro && <p className="mt-3 text-lg leading-relaxed text-text">{content.intro}</p>}
 

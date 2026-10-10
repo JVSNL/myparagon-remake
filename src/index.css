@@ -9,7 +9,7 @@
  * semantic names so dark mode works everywhere.
  */
 :root {
-  --bg: #f4f6f8;
+  --bg: #f2f6f9;
   --surface: #ffffff;
   --surface-2: #eef2f5;
   --border: #e1e6ea;
@@ -27,6 +27,29 @@
   --danger: #a85500;
   --overlay: rgb(15 30 40 / 0.45);
   --shadow: 0 1px 2px rgb(19 77 113 / 0.06), 0 4px 16px rgb(19 77 113 / 0.06);
+  /* Categorical brand colours (house style palette): solid, soft tint and a text
+     shade that keeps WCAG AA contrast on the tint and on white. */
+  --c-navy: #134d71;
+  --c-navy-soft: #e2edf4;
+  --c-navy-text: #134d71;
+  --c-royal: #238acb;
+  --c-royal-soft: #e0eff9;
+  --c-royal-text: #17699c;
+  --c-sky: #56beec;
+  --c-sky-soft: #e2f4fc;
+  --c-sky-text: #136b93;
+  --c-orange: #e38900;
+  --c-orange-soft: #fcecd2;
+  --c-orange-text: #8f5300;
+  --c-sienna: #c56603;
+  --c-sienna-soft: #f8e4d0;
+  --c-sienna-text: #9a4f02;
+  --c-sage: #007059;
+  --c-sage-soft: #d9eee6;
+  --c-sage-text: #00634f;
+  --c-berry: #85406b;
+  --c-berry-soft: #f3e2ec;
+  --c-berry-text: #7a3a62;
   color-scheme: light;
 }
 
@@ -49,6 +72,27 @@
   --danger: #f0a35a;
   --overlay: rgb(0 0 0 / 0.6);
   --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
+  --c-navy: #3a7fae;
+  --c-navy-soft: #183447;
+  --c-navy-text: #9fd0f0;
+  --c-royal: #3a9ee0;
+  --c-royal-soft: #173a52;
+  --c-royal-text: #8fcdf5;
+  --c-sky: #56beec;
+  --c-sky-soft: #143c4f;
+  --c-sky-text: #8fd6f5;
+  --c-orange: #e38900;
+  --c-orange-soft: #43301a;
+  --c-orange-text: #f5bd6b;
+  --c-sienna: #d9772a;
+  --c-sienna-soft: #422a1a;
+  --c-sienna-text: #f1aa74;
+  --c-sage: #3fa88a;
+  --c-sage-soft: #163b33;
+  --c-sage-text: #8fd3bd;
+  --c-berry: #b0628f;
+  --c-berry-soft: #3b2232;
+  --c-berry-text: #e5aacb;
   color-scheme: dark;
 }
 
@@ -72,6 +116,28 @@
   --color-focus: var(--focus);
   --color-danger: var(--danger);
   --color-overlay: var(--overlay);
+
+  --color-c-navy: var(--c-navy);
+  --color-c-navy-soft: var(--c-navy-soft);
+  --color-c-navy-text: var(--c-navy-text);
+  --color-c-royal: var(--c-royal);
+  --color-c-royal-soft: var(--c-royal-soft);
+  --color-c-royal-text: var(--c-royal-text);
+  --color-c-sky: var(--c-sky);
+  --color-c-sky-soft: var(--c-sky-soft);
+  --color-c-sky-text: var(--c-sky-text);
+  --color-c-orange: var(--c-orange);
+  --color-c-orange-soft: var(--c-orange-soft);
+  --color-c-orange-text: var(--c-orange-text);
+  --color-c-sienna: var(--c-sienna);
+  --color-c-sienna-soft: var(--c-sienna-soft);
+  --color-c-sienna-text: var(--c-sienna-text);
+  --color-c-sage: var(--c-sage);
+  --color-c-sage-soft: var(--c-sage-soft);
+  --color-c-sage-text: var(--c-sage-text);
+  --color-c-berry: var(--c-berry);
+  --color-c-berry-soft: var(--c-berry-soft);
+  --color-c-berry-text: var(--c-berry-text);
 
   --shadow-card: var(--shadow);
 }

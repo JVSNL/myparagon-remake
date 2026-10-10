@@ -1,6 +1,7 @@
 # myNexora
 
-Employee app for the fictional company **Nexora**: news, colleagues and company information in one place.
+Employee app for **Nexora**, a fictional company that designs e-bikes and cargo bikes: news, colleagues and company
+information in one place.
 A functional remake of an existing intranet app, rebuilt with a cleaner design. All content, names and
 images are dummy data.
 

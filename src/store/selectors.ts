@@ -7,6 +7,8 @@ export const userById = (state: AppState, id: string) => state.users.find((u) =>
 
 export const channelName = (state: AppState, id: string) => state.channels.find((c) => c.id === id)?.name ?? ''
 
+export const channelColor = (state: AppState, id: string) => state.channels.find((c) => c.id === id)?.color ?? 'navy'
+
 export const sortedPosts = (state: AppState) => [...state.posts].sort((a, b) => b.createdAt - a.createdAt)
 
 export const reactionTotal = (post: Post) => Object.values(post.reactions).reduce((sum, list) => sum + list.length, 0)

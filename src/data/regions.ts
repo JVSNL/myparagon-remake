@@ -12,8 +12,8 @@ export interface RegionInfo {
 
 export const REGIONS: RegionInfo[] = [
   { id: 'benelux', name: 'Benelux', countries: ['NL', 'BE'], tone: 'navy', team: [userId(1), userId(3), userId(6), userId(5), userId(44)] },
-  { id: 'dach', name: 'DACH', countries: ['DE'], tone: 'sky', team: [userId(1), userId(2), userId(7), userId(18), userId(25)] },
-  { id: 'cee', name: 'CEE', countries: ['PL', 'CZ'], tone: 'sage', team: [userId(1), userId(4), userId(36), userId(52)] },
+  { id: 'nordics', name: 'Nordics', countries: ['DK'], tone: 'sky', team: [userId(1), userId(4), userId(36), userId(22)] },
+  { id: 'iberia', name: 'Iberia', countries: ['ES'], tone: 'warm', team: [userId(1), userId(7), userId(26), userId(50)] },
 ]
 
 export const regionOfCountry = (country: CountryCode): RegionId =>

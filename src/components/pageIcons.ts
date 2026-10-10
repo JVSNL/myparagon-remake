@@ -1,5 +1,10 @@
 import {
   BadgeCheck,
+  Bike,
+  Headset,
+  Mountain,
+  Palette,
+  Wrench,
   CircleHelp,
   Compass,
   Factory,
@@ -21,6 +26,11 @@ import {
 /** Icons that pages can use (page.icon). */
 export const PAGE_ICONS: Record<string, LucideIcon> = {
   'badge-check': BadgeCheck,
+  bike: Bike,
+  headset: Headset,
+  mountain: Mountain,
+  palette: Palette,
+  wrench: Wrench,
   'circle-help': CircleHelp,
   compass: Compass,
   factory: Factory,

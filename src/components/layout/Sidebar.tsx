@@ -1,4 +1,5 @@
 import { Link, NavLink } from 'react-router-dom'
+import { COLOR_CLASSES } from '../../lib/colors'
 import { useT } from '../../lib/preferences'
 import { useRegion } from '../../lib/useRegion'
 import { fullName, unreadChats, unreadCount } from '../../store/selectors'
@@ -21,18 +22,18 @@ export function Sidebar() {
       </Link>
       <nav aria-label={t('nav.main')} className="flex-1">
         <ul className="space-y-1">
-          {SIDEBAR_ITEMS.map(({ to, label, icon: Icon, end }) => (
+          {SIDEBAR_ITEMS.map(({ to, label, icon: Icon, end, color }) => (
             <li key={to}>
               <NavLink
                 to={to}
                 end={end}
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors ${
-                    isActive ? 'bg-primary-soft text-primary' : 'text-text hover:bg-surface-2'
+                    isActive ? `${COLOR_CLASSES[color].soft} ${COLOR_CLASSES[color].text}` : 'text-text hover:bg-surface-2'
                   }`
                 }
               >
-                <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
+                <Icon className={`size-5 ${COLOR_CLASSES[color].text}`} strokeWidth={1.75} aria-hidden="true" />
                 <span className="flex-1">{to === '/region' ? region.name : t(label)}</span>
                 {to === '/general' && chats > 0 && (
                   <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">

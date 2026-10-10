@@ -18,8 +18,12 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
   never the logo files from the skill.
 - Components use the semantic tokens from `src/index.css` (`bg-surface`, `text-heading`,
   `text-primary`, …), never raw hex values, so dark mode keeps working.
-- Brand blue `#134D71` for headings, navigation and primary buttons; orange `#E38900` sparingly
-  (badges, unread dots), always with dark text (`text-on-accent`).
+- Brand blue `#134D71` for headings, navigation and primary buttons. For colour, use the
+  categorical palette tokens (`bg-c-<name>-soft`, `text-c-<name>-text`, `bg-c-<name>`; names: navy,
+  royal, sky, orange, sienna, sage, berry) via `src/lib/colors.ts` — they are AA-checked in both
+  themes. Channels and navigation items each have their own colour.
+- Content stays far from the original app: Nexora is a fictional e-bike company (NL/BE/DK/ES)
+  and posts are light, everyday topics.
 - WCAG AA: brand grey `#7F7F7F`, royal blue `#238ACB` and orange fail as text colour on white —
   use `text-muted` / `text-primary` instead. Every interactive element needs an accessible name.
 - Slightly rounded (12px cards), subtle shadows, lots of white space, subtle motion that respects
