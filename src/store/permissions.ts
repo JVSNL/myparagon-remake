@@ -1,0 +1,9 @@
+import type { Comment, User } from '../data/types'
+
+export const canPublish = (user: User | null) => user?.role === 'editor' || user?.role === 'admin'
+
+export const canEditComment = (user: User | null, comment: Comment) =>
+  !!user && !comment.deleted && comment.authorId === user.id
+
+export const canDeleteComment = (user: User | null, comment: Comment) =>
+  !!user && !comment.deleted && (comment.authorId === user.id || user.role === 'admin')
