@@ -1,0 +1,146 @@
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Design tokens. Brand values come from the house style skill
+ * (.claude/skills/paragon-presentation-designer/references/huisstijl.md).
+ * Semantic tokens switch between light and dark; components only use the
+ * semantic names so dark mode works everywhere.
+ */
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef2f5;
+  --border: #e1e6ea;
+  --text: #3f3f3f;
+  --heading: #134d71;
+  --muted: #5d6870;
+  --primary: #134d71;
+  --primary-hover: #0e3b57;
+  --on-primary: #ffffff;
+  --primary-soft: #e6f0f6;
+  --link: #134d71;
+  --accent: #e38900;
+  --on-accent: #1c1305;
+  --focus: #238acb;
+  --danger: #a85500;
+  --overlay: rgb(15 30 40 / 0.45);
+  --shadow: 0 1px 2px rgb(19 77 113 / 0.06), 0 4px 16px rgb(19 77 113 / 0.06);
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0c171f;
+  --surface: #13222d;
+  --surface-2: #1a2d3a;
+  --border: #253c4b;
+  --text: #e3e9ed;
+  --heading: #ffffff;
+  --muted: #9fb0bb;
+  --primary: #56beec;
+  --primary-hover: #7ccdf1;
+  --on-primary: #0c171f;
+  --primary-soft: #183447;
+  --link: #7ccdf1;
+  --accent: #e38900;
+  --on-accent: #1c1305;
+  --focus: #56beec;
+  --danger: #f0a35a;
+  --overlay: rgb(0 0 0 / 0.6);
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 4px 16px rgb(0 0 0 / 0.25);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: 'Roboto', Arial, sans-serif;
+
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-text: var(--text);
+  --color-heading: var(--heading);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-on-primary: var(--on-primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-link: var(--link);
+  --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-focus: var(--focus);
+  --color-danger: var(--danger);
+  --color-overlay: var(--overlay);
+
+  --shadow-card: var(--shadow);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 220ms ease-out both;
+}
+
+.animate-pop {
+  animation: pop 260ms ease-out;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
