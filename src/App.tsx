@@ -6,6 +6,11 @@ import { ArticlePage } from './pages/ArticlePage'
 import { BookmarksPage } from './pages/BookmarksPage'
 import { ComposePage } from './pages/ComposePage'
 import { ComingSoonPage } from './pages/ComingSoonPage'
+import { ContentPage } from './pages/ContentPage'
+import { DocumentPage } from './pages/DocumentPage'
+import { GeneralPage } from './pages/GeneralPage'
+import { LocationsPage } from './pages/LocationsPage'
+import { StoriesPage } from './pages/StoriesPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { MenuPage } from './pages/MenuPage'
@@ -37,7 +42,11 @@ export function AppRoutes() {
         <Route path="bookmarks" element={<BookmarksPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
         <Route path="region" element={<ComingSoonPage title="region.title" body="region.soon" phase={3} />} />
-        <Route path="general" element={<ComingSoonPage title="general.title" body="general.soon" phase={4} />} />
+        <Route path="general" element={<GeneralPage />} />
+        <Route path="pages/:slug" element={<ContentPage />} />
+        <Route path="stories" element={<StoriesPage />} />
+        <Route path="locations" element={<LocationsPage />} />
+        <Route path="documents/:documentId" element={<DocumentPage />} />
         <Route path="menu" element={<MenuPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />

@@ -1,0 +1,41 @@
+import {
+  BadgeCheck,
+  CircleHelp,
+  Compass,
+  Factory,
+  FileText,
+  Handshake,
+  Landmark,
+  Leaf,
+  LifeBuoy,
+  Mail,
+  Megaphone,
+  Package,
+  Scale,
+  Server,
+  Users,
+  Workflow,
+  type LucideIcon,
+} from 'lucide-react'
+
+/** Icons that pages can use (page.icon). */
+export const PAGE_ICONS: Record<string, LucideIcon> = {
+  'badge-check': BadgeCheck,
+  'circle-help': CircleHelp,
+  compass: Compass,
+  factory: Factory,
+  'file-text': FileText,
+  handshake: Handshake,
+  landmark: Landmark,
+  leaf: Leaf,
+  'life-buoy': LifeBuoy,
+  mail: Mail,
+  megaphone: Megaphone,
+  package: Package,
+  scale: Scale,
+  server: Server,
+  users: Users,
+  workflow: Workflow,
+}
+
+export const pageIcon = (name: string): LucideIcon => PAGE_ICONS[name] ?? FileText

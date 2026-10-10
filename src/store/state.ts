@@ -1,4 +1,4 @@
-import type { AppNotification, ImageRef, Channel, Comment, Post, User } from '../data/types'
+import type { AppNotification, Channel, Comment, ImageRef, Location, Page, Post, User } from '../data/types'
 
 export interface AppState {
   version: number
@@ -12,6 +12,8 @@ export interface AppState {
   /** userId -> bookmarked post ids, most recent first. */
   bookmarks: Record<string, string[]>
   notifications: AppNotification[]
+  pages: Page[]
+  locations: Location[]
 }
 
 export interface NewPostInput {
