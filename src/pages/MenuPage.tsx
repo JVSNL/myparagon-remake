@@ -67,7 +67,6 @@ export function MenuPage() {
           <ListRow icon={Settings} label={t('nav.settings')} to="/settings" />
         </ListGroup>
 
-        <p className="px-1 text-sm text-muted">{t('menu.phaseNote')}</p>
       </div>
     </>
   )

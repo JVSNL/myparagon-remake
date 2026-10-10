@@ -6,6 +6,7 @@ import { PageHeader } from '../components/layout/PageHeader'
 import { Sheet } from '../components/Sheet'
 import type { CountryCode, User } from '../data/types'
 import { usePreferences } from '../lib/preferences'
+import { matchesQuery, normalize } from '../lib/search'
 import { fullName } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
@@ -16,19 +17,6 @@ interface Filters {
 }
 
 const EMPTY: Filters = { country: '', location: '', department: '' }
-
-const normalize = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase()
-
-export const matchesQuery = (user: User, query: string) => {
-  const q = normalize(query.trim())
-  if (!q) return true
-  const haystack = normalize([fullName(user), user.jobTitle, user.department, user.location, ...user.skills].join(' '))
-  return q.split(/\s+/).every((word) => haystack.includes(word))
-}
 
 const selectClass =
   'mt-1.5 block w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-[15px] text-text focus:border-focus focus:outline-none'

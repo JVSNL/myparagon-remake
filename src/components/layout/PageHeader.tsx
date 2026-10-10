@@ -1,4 +1,4 @@
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, Search } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
@@ -28,7 +28,7 @@ export function PageHeader({ title, backTo, actions, showLogo }: Props) {
   return (
     <header className="pt-safe sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:backdrop-blur-none">
       <div className="mx-auto flex h-14 max-w-2xl items-center gap-2 px-2 lg:h-auto lg:px-4 lg:pt-10 lg:pb-6">
-        <div className="flex w-24 items-center lg:w-auto">
+        <div className="flex min-w-24 items-center lg:min-w-0">
           {backTo ? (
             <button
               type="button"
@@ -47,9 +47,18 @@ export function PageHeader({ title, backTo, actions, showLogo }: Props) {
         <h1 className="flex-1 truncate text-center text-[17px] font-medium text-heading lg:text-left lg:text-3xl lg:font-light">
           {title}
         </h1>
-        <div className="flex w-24 items-center justify-end gap-1 lg:w-auto">
+        <div className="flex min-w-24 items-center justify-end gap-1 lg:min-w-0">
           {actions}
-          <span className="lg:hidden">
+          <span className="flex lg:hidden">
+            {location.pathname !== '/search' && (
+              <Link
+                to="/search"
+                aria-label={t('search.open')}
+                className="flex size-10 items-center justify-center rounded-full text-heading hover:bg-surface-2"
+              >
+                <Search className="size-[22px]" strokeWidth={1.75} aria-hidden="true" />
+              </Link>
+            )}
             <NotificationBell />
           </span>
         </div>

@@ -29,6 +29,7 @@ import { PeoplePage } from './pages/PeoplePage'
 import { ProfileEditPage } from './pages/ProfileEditPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegionPage } from './pages/RegionPage'
+import { SearchPage } from './pages/SearchPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { StoreProvider } from './store/StoreProvider'
 import type { AppState } from './store/state'
@@ -71,6 +72,7 @@ export function AppRoutes() {
         <Route path="menu" element={<MenuPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="feedback" element={<FeedbackPage />} />
+        <Route path="search" element={<SearchPage />} />
         <Route path="beheer" element={<AdminPage />} />
         <Route path="beheer/pages/:pageId" element={<PageEditorPage />} />
         <Route path="beheer/posts/:postId" element={<PostEditorPage />} />

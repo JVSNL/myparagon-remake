@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedState } from '../data/seed'
 import { regionOfCountry } from '../data/regions'
 import { pathTo } from './OrgChartPage'
-import { matchesQuery } from './PeoplePage'
+import { matchesQuery } from '../lib/search'
 
 const { users } = buildSeedState(Date.now())
 const byName = (first: string) => users.find((u) => u.firstName === first)!

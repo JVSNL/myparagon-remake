@@ -1,4 +1,4 @@
-import { Bell, Bookmark, Globe, House, Info, Menu, Settings, type LucideIcon } from 'lucide-react'
+import { Bell, Bookmark, Globe, House, Info, Menu, Search, Settings, type LucideIcon } from 'lucide-react'
 import type { MessageKey } from '../../lib/i18n/nl'
 
 export interface NavItem {
@@ -18,7 +18,9 @@ export const TAB_ITEMS: NavItem[] = [
 
 /** Sidebar on desktop: the tabs plus what lives behind "Menu" on mobile. */
 export const SIDEBAR_ITEMS: NavItem[] = [
-  ...TAB_ITEMS,
+  TAB_ITEMS[0],
+  { to: '/search', label: 'search.title', icon: Search },
+  ...TAB_ITEMS.slice(1),
   { to: '/bookmarks', label: 'nav.bookmarks', icon: Bookmark },
   { to: '/notifications', label: 'nav.notifications', icon: Bell },
   { to: '/settings', label: 'nav.settings', icon: Settings },
