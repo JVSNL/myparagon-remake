@@ -1,4 +1,17 @@
-import type { AppNotification, Channel, Comment, ImageRef, Location, Page, Post, RegionId, User } from '../data/types'
+import type {
+  AppNotification,
+  Channel,
+  ChatMessage,
+  Comment,
+  Conversation,
+  ImageRef,
+  Location,
+  Page,
+  Post,
+  Question,
+  RegionId,
+  User,
+} from '../data/types'
 
 export interface AppState {
   version: number
@@ -16,6 +29,11 @@ export interface AppState {
   locations: Location[]
   /** Region chosen per user on the Region tab; defaults to the region of their country. */
   regionChoice: Record<string, RegionId>
+  conversations: Conversation[]
+  messages: ChatMessage[]
+  /** userId -> conversationId -> time the user last read it. */
+  chatRead: Record<string, Record<string, number>>
+  questions: Question[]
 }
 
 export type ProfileChanges = Partial<
@@ -61,4 +79,13 @@ export type Action =
     }
   | { type: 'chooseRegion'; region: RegionId }
   | { type: 'updateProfile'; userId: string; changes: ProfileChanges }
+  | { type: 'startConversation'; id: string; memberIds: string[]; name?: string; now: number }
+  | { type: 'sendMessage'; id: string; conversationId: string; text: string; now: number }
+  | { type: 'markConversationRead'; conversationId: string; now: number }
+  /** A (simulated) colleague answers in a conversation. */
+  | { type: 'colleagueMessage'; id: string; conversationId: string; authorId: string; text: string; now: number }
+  | { type: 'askQuestion'; id: string; text: string; visibility: 'public' | 'board'; now: number }
+  | { type: 'answerQuestion'; questionId: string; text: string; now: number; notificationId: string }
+  /** A (simulated) board member answers a question. */
+  | { type: 'boardAnswers'; questionId: string; authorId: string; text: string; now: number; notificationId: string }
   | { type: 'reset'; state: AppState }

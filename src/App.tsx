@@ -3,6 +3,10 @@ import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-r
 import { AppShell } from './components/layout/AppShell'
 import { PreferencesProvider } from './lib/preferences'
 import { ArticlePage } from './pages/ArticlePage'
+import { AskBoardPage } from './pages/AskBoardPage'
+import { ChatListPage } from './pages/chat/ChatListPage'
+import { ChatThreadPage } from './pages/chat/ChatThreadPage'
+import { NewChatPage } from './pages/chat/NewChatPage'
 import { BookmarksPage } from './pages/BookmarksPage'
 import { ComposePage } from './pages/ComposePage'
 import { ContentPage } from './pages/ContentPage'
@@ -51,6 +55,10 @@ export function AppRoutes() {
         <Route path="people/:userId/edit" element={<ProfileEditPage />} />
         <Route path="profile" element={<ProfilePage own />} />
         <Route path="org" element={<OrgChartPage />} />
+        <Route path="chat" element={<ChatListPage />} />
+        <Route path="chat/new" element={<NewChatPage />} />
+        <Route path="chat/:conversationId" element={<ChatThreadPage />} />
+        <Route path="ask-the-board" element={<AskBoardPage />} />
         <Route path="general" element={<GeneralPage />} />
         <Route path="pages/:slug" element={<ContentPage />} />
         <Route path="stories" element={<StoriesPage />} />

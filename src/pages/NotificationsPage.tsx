@@ -51,8 +51,14 @@ export function NotificationsPage() {
           <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-surface">
             {items.map((n) => {
               const actor = userById(state, n.actorId)
-              const post = state.posts.find((p) => p.id === n.postId)
-              const href = n.commentId ? `/news/${n.postId}?comment=${n.commentId}` : `/news/${n.postId}`
+              const post = n.postId ? state.posts.find((p) => p.id === n.postId) : undefined
+              const question = n.questionId ? state.questions.find((q) => q.id === n.questionId) : undefined
+              const href = question
+                ? `/ask-the-board#q-${question.id}`
+                : n.commentId
+                  ? `/news/${n.postId}?comment=${n.commentId}`
+                  : `/news/${n.postId}`
+              const subject = post?.title ?? question?.text
               return (
                 <li key={n.id}>
                   <Link
@@ -65,7 +71,7 @@ export function NotificationsPage() {
                       <span className="block text-[15px] text-text">
                         {t(`notifications.${n.type}`, { name: actor ? fullName(actor) : '?' })}
                       </span>
-                      {post && <span className="block truncate text-sm text-muted">{post.title}</span>}
+                      {subject && <span className="block truncate text-sm text-muted">{subject}</span>}
                       <time
                         className="mt-0.5 block text-xs text-muted"
                         dateTime={new Date(n.createdAt).toISOString()}

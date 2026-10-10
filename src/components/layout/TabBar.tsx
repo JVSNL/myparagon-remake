@@ -1,11 +1,15 @@
 import { NavLink } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
 import { useRegion } from '../../lib/useRegion'
+import { unreadChats } from '../../store/selectors'
+import { useStore } from '../../store/StoreProvider'
 import { TAB_ITEMS } from './navItems'
 
 export function TabBar() {
   const t = useT()
   const region = useRegion()
+  const { state, me } = useStore()
+  const chats = me ? unreadChats(state, me.id) : 0
   return (
     <nav
       aria-label={t('nav.main')}
@@ -26,13 +30,17 @@ export function TabBar() {
               {({ isActive }) => (
                 <>
                   <span
-                    className={`flex h-7 w-12 items-center justify-center rounded-full transition-colors ${
+                    className={`relative flex h-7 w-12 items-center justify-center rounded-full transition-colors ${
                       isActive ? 'bg-primary-soft' : ''
                     }`}
                   >
                     <Icon className="size-5" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
+                    {to === '/general' && chats > 0 && (
+                      <span className="absolute top-0 right-2.5 size-2.5 rounded-full bg-accent ring-2 ring-surface" aria-hidden="true" />
+                    )}
                   </span>
                   {to === '/region' ? region.name : t(label)}
+                  {to === '/general' && chats > 0 && <span className="sr-only">, {t('chat.unread', { n: chats })}</span>}
                 </>
               )}
             </NavLink>
