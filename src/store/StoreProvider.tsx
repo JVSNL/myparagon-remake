@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
 import { buildSeedState, STATE_VERSION } from '../data/seed'
 import { userId as seedUserId } from '../data/seed/users'
-import type { RegionId, User } from '../data/types'
+import type { Feedback, ImageRef, Lang, NotificationPrefs, PageContent, PageSection, PostContent, RegionId, User } from '../data/types'
 import { clearImages } from '../lib/imageStore'
 import { readJson, writeJson } from '../lib/storage'
 import { reducer } from './reducer'
@@ -114,6 +114,22 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     },
     answerQuestion: (questionId: string, text: string) =>
       dispatch({ type: 'answerQuestion', questionId, text, now: Date.now(), notificationId: newId('n') }),
+    savePageDraft: (pageId: string, content: PageContent) => dispatch({ type: 'savePageDraft', pageId, content }),
+    discardPageDraft: (pageId: string) => dispatch({ type: 'discardPageDraft', pageId }),
+    publishPage: (pageId: string) => dispatch({ type: 'publishPage', pageId, versionId: newId('v'), now: Date.now() }),
+    restorePageVersion: (pageId: string, versionId: string) => dispatch({ type: 'restorePageVersion', pageId, versionId }),
+    createPage: (slug: string, section: PageSection, title: string) => {
+      const id = newId('pg')
+      dispatch({ type: 'createPage', id, slug, section, title, now: Date.now() })
+      return id
+    },
+    updatePost: (postId: string, lang: Lang, content: PostContent, image?: ImageRef) =>
+      dispatch({ type: 'updatePost', postId, lang, content, image }),
+    removePostTranslation: (postId: string, lang: Exclude<Lang, 'nl'>) => dispatch({ type: 'removePostTranslation', postId, lang }),
+    deletePost: (postId: string) => dispatch({ type: 'deletePost', postId }),
+    setNotificationPrefs: (prefs: NotificationPrefs) => dispatch({ type: 'setNotificationPrefs', prefs }),
+    sendFeedback: (topic: Feedback['topic'], text: string) =>
+      dispatch({ type: 'sendFeedback', id: newId('fb'), topic, text, now: Date.now() }),
     resetDemo: () => {
       void clearImages()
       dispatch({ type: 'reset', state: buildSeedState(Date.now()) })

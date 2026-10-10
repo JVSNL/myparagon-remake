@@ -4,7 +4,7 @@ import type { Post } from '../data/types'
 import { usePreferences } from '../lib/preferences'
 import { formatFull, formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
-import { channelName, commentCount } from '../store/selectors'
+import { channelName, commentCount, postContent } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 import { PostImage } from './PostImage'
 import { ReactionSummary } from './reactions/ReactionSummary'
@@ -14,6 +14,7 @@ export function PostCard({ post }: { post: Post }) {
   const { state } = useStore()
   const now = useNow()
   const comments = commentCount(state, post.id)
+  const content = postContent(post, locale)
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border bg-surface shadow-card transition-shadow hover:shadow-lg">
@@ -29,10 +30,10 @@ export function PostCard({ post }: { post: Post }) {
         <h2 className="mt-1 text-xl leading-snug font-medium text-heading">
           {/* The whole card is clickable via this link's ::after overlay. */}
           <Link to={`/news/${post.id}`} className="after:absolute after:inset-0 focus-visible:outline-none">
-            {post.title}
+            {content.title}
           </Link>
         </h2>
-        <p className="mt-1.5 line-clamp-2 text-[15px] text-text">{post.intro}</p>
+        <p className="mt-1.5 line-clamp-2 text-[15px] text-text">{content.intro}</p>
         <div className="mt-4 flex items-center justify-between">
           <ReactionSummary post={post} />
           {comments > 0 && (

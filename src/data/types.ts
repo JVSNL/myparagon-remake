@@ -50,6 +50,8 @@ export interface Post {
   image: ImageRef
   createdAt: number
   reactions: Reactions
+  /** Optional translations of title, intro and body; Dutch is the original. */
+  translations?: Partial<Record<Exclude<Lang, 'nl'>, PostContent>>
 }
 
 export interface Comment {
@@ -146,6 +148,37 @@ export interface Page {
   blocks: Localized<Block[]>
   updatedAt: number
   updatedBy: string
+  /** Unpublished changes; only editors see them (in the editor). */
+  draft?: PageContent
+  /** Earlier published versions, newest first. */
+  history: PageVersion[]
+}
+
+export interface PageContent {
+  title: Localized<string>
+  blocks: Localized<Block[]>
+}
+
+export interface PageVersion extends PageContent {
+  id: string
+  publishedAt: number
+  publishedBy: string
+}
+
+export interface PostContent {
+  title: string
+  intro: string
+  body: string[]
+}
+
+export type NotificationPrefs = Record<'new_post' | 'reply' | 'comment_like' | 'question_answered', boolean>
+
+export interface Feedback {
+  id: string
+  authorId: string
+  topic: 'idea' | 'problem' | 'other'
+  text: string
+  createdAt: number
 }
 
 export interface Location {

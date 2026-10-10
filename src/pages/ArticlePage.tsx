@@ -1,4 +1,5 @@
-import { Bookmark, MessageCircle, SmilePlus } from 'lucide-react'
+import { Bookmark, MessageCircle, Pencil, SmilePlus } from 'lucide-react'
+import { canEditContent } from '../store/permissions'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { PostImage } from '../components/PostImage'
@@ -9,7 +10,7 @@ import { ReactionChips } from '../components/reactions/ReactionChips'
 import { ReactionPicker } from '../components/reactions/ReactionPicker'
 import { usePreferences } from '../lib/preferences'
 import { formatFull } from '../lib/time'
-import { channelName, fullName, isBookmarked, userById } from '../store/selectors'
+import { channelName, fullName, isBookmarked, postContent, userById } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 export function ArticlePage() {
@@ -36,6 +37,7 @@ export function ArticlePage() {
   }
 
   const author = userById(state, post.authorId)
+  const content = postContent(post, locale)
   const saved = !!me && isBookmarked(state, me.id, post.id)
   const myReactions = me ? Object.keys(post.reactions).filter((e) => post.reactions[e].includes(me.id)) : []
 
@@ -49,13 +51,27 @@ export function ArticlePage() {
 
   return (
     <>
-      <PageHeader title={channelName(state, post.channelId)} backTo="/" />
+      <PageHeader
+        title={channelName(state, post.channelId)}
+        backTo="/"
+        actions={
+          canEditContent(me) && (
+            <Link
+              to={`/beheer/posts/${post.id}`}
+              aria-label={t('post.edit')}
+              className="flex size-10 items-center justify-center rounded-full text-heading hover:bg-surface-2"
+            >
+              <Pencil className="size-5" strokeWidth={1.75} aria-hidden="true" />
+            </Link>
+          )
+        }
+      />
       <article className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
         <PostImage image={post.image} className="aspect-[16/9] w-full rounded-xl" />
 
         <p className="mt-5 text-sm font-medium text-primary">{channelName(state, post.channelId)}</p>
-        <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{post.title}</h1>
-        {post.intro && <p className="mt-3 text-lg leading-relaxed text-text">{post.intro}</p>}
+        <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{content.title}</h1>
+        {content.intro && <p className="mt-3 text-lg leading-relaxed text-text">{content.intro}</p>}
 
         {author && (
           <div className="mt-5 flex items-center gap-3 border-y border-border py-3">
@@ -71,7 +87,7 @@ export function ArticlePage() {
         )}
 
         <div className="mt-6 space-y-4 text-[17px] leading-relaxed text-text">
-          {post.body.map((paragraph, i) => (
+          {content.body.map((paragraph, i) => (
             <p key={i}>{paragraph}</p>
           ))}
         </div>

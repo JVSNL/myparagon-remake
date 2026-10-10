@@ -1,4 +1,4 @@
-import type { Comment, Post, User } from '../data/types'
+import type { AppNotification, Comment, Lang, NotificationPrefs, Post, PostContent, User } from '../data/types'
 import type { AppState } from './state'
 
 export const fullName = (u: Pick<User, 'firstName' | 'lastName'>) => `${u.firstName} ${u.lastName}`
@@ -30,11 +30,39 @@ export const commentThreads = (comments: Comment[]) => {
     .map((c) => ({ comment: c, replies: byDate.filter((r) => r.parentId === c.id) }))
 }
 
-export const notificationsFor = (state: AppState, userId: string) =>
-  state.notifications.filter((n) => n.userId === userId).sort((a, b) => b.createdAt - a.createdAt)
+export const DEFAULT_NOTIFICATION_PREFS: NotificationPrefs = {
+  new_post: true,
+  reply: true,
+  comment_like: true,
+  question_answered: true,
+}
 
-export const unreadCount = (state: AppState, userId: string) =>
-  state.notifications.filter((n) => n.userId === userId && !n.read).length
+export const notificationPrefsFor = (state: AppState, userId: string) => ({
+  ...DEFAULT_NOTIFICATION_PREFS,
+  ...state.notificationPrefs[userId],
+})
+
+const PREF_OF: Record<AppNotification['type'], keyof NotificationPrefs> = {
+  new_post: 'new_post',
+  reply: 'reply',
+  comment_like: 'comment_like',
+  post_reaction: 'comment_like',
+  question_answered: 'question_answered',
+}
+
+/** The user's notifications, newest first, without the types they switched off. */
+export const notificationsFor = (state: AppState, userId: string) => {
+  const prefs = notificationPrefsFor(state, userId)
+  return state.notifications
+    .filter((n) => n.userId === userId && prefs[PREF_OF[n.type]])
+    .sort((a, b) => b.createdAt - a.createdAt)
+}
+
+export const unreadCount = (state: AppState, userId: string) => notificationsFor(state, userId).filter((n) => !n.read).length
+
+/** Title, intro and body in the requested language, falling back to the Dutch original. */
+export const postContent = (post: Post, lang: Lang): PostContent =>
+  (lang !== 'nl' && post.translations?.[lang]) || { title: post.title, intro: post.intro, body: post.body }
 
 export const isBookmarked = (state: AppState, userId: string, postId: string) =>
   (state.bookmarks[userId] ?? []).includes(postId)

@@ -1,5 +1,5 @@
 import type { AppNotification, Comment } from '../data/types'
-import { canAnswerQuestions, canDeleteComment, canEditComment, canPublish } from './permissions'
+import { canAnswerQuestions, canDeleteComment, canEditComment, canEditContent, canPublish } from './permissions'
 import type { Action, AppState } from './state'
 
 const toggle = (list: string[], value: string) =>
@@ -250,6 +250,118 @@ export function reducer(state: AppState, action: Action): AppState {
           ...state.notifications,
         ],
       }
+    }
+
+    case 'savePageDraft': {
+      if (!canEditContent(me) || !state.pages.some((p) => p.id === action.pageId)) return state
+      return { ...state, pages: state.pages.map((p) => (p.id === action.pageId ? { ...p, draft: action.content } : p)) }
+    }
+
+    case 'discardPageDraft': {
+      if (!canEditContent(me)) return state
+      return { ...state, pages: state.pages.map((p) => (p.id === action.pageId ? { ...p, draft: undefined } : p)) }
+    }
+
+    case 'publishPage': {
+      const page = state.pages.find((p) => p.id === action.pageId)
+      if (!canEditContent(me) || !page?.draft || !page.draft.title.nl.trim()) return state
+      // The version that was live until now goes into the history (max. 20 kept).
+      const previous = { id: action.versionId, title: page.title, blocks: page.blocks, publishedAt: page.updatedAt, publishedBy: page.updatedBy }
+      return {
+        ...state,
+        pages: state.pages.map((p) =>
+          p.id === page.id
+            ? {
+                ...p,
+                ...page.draft,
+                draft: undefined,
+                updatedAt: action.now,
+                updatedBy: me.id,
+                history: [previous, ...p.history].slice(0, 20),
+              }
+            : p,
+        ),
+      }
+    }
+
+    case 'restorePageVersion': {
+      const page = state.pages.find((p) => p.id === action.pageId)
+      const version = page?.history.find((v) => v.id === action.versionId)
+      if (!canEditContent(me) || !page || !version) return state
+      return {
+        ...state,
+        pages: state.pages.map((p) => (p.id === page.id ? { ...p, draft: { title: version.title, blocks: version.blocks } } : p)),
+      }
+    }
+
+    case 'createPage': {
+      const title = action.title.trim()
+      const slug = action.slug.trim()
+      if (!canEditContent(me) || !title || !/^[a-z0-9-]+$/.test(slug) || state.pages.some((p) => p.slug === slug)) return state
+      return {
+        ...state,
+        pages: [
+          ...state.pages,
+          {
+            id: action.id,
+            slug,
+            section: action.section,
+            icon: 'file-text',
+            title: { nl: title },
+            blocks: { nl: [{ id: `${action.id}-b1`, type: 'hero', title, tone: 'navy' }] },
+            updatedAt: action.now,
+            updatedBy: me.id,
+            history: [],
+          },
+        ],
+      }
+    }
+
+    case 'updatePost': {
+      const post = state.posts.find((p) => p.id === action.postId)
+      const content = {
+        title: action.content.title.trim(),
+        intro: action.content.intro.trim(),
+        body: action.content.body.map((b) => b.trim()).filter(Boolean),
+      }
+      if (!canEditContent(me) || !post || !content.title) return state
+      const updated =
+        action.lang === 'nl'
+          ? { ...post, ...content, ...(action.image ? { image: action.image } : {}) }
+          : { ...post, translations: { ...post.translations, [action.lang]: content } }
+      return { ...state, posts: state.posts.map((p) => (p.id === post.id ? updated : p)) }
+    }
+
+    case 'removePostTranslation': {
+      if (!canEditContent(me)) return state
+      return {
+        ...state,
+        posts: state.posts.map((p) => {
+          if (p.id !== action.postId || !p.translations) return p
+          const { [action.lang]: _removed, ...rest } = p.translations
+          return { ...p, translations: rest }
+        }),
+      }
+    }
+
+    case 'deletePost': {
+      if (!canEditContent(me) || !state.posts.some((p) => p.id === action.postId)) return state
+      return {
+        ...state,
+        posts: state.posts.filter((p) => p.id !== action.postId),
+        comments: state.comments.filter((c) => c.postId !== action.postId),
+        notifications: state.notifications.filter((n) => n.postId !== action.postId),
+        bookmarks: Object.fromEntries(Object.entries(state.bookmarks).map(([u, ids]) => [u, ids.filter((id) => id !== action.postId)])),
+      }
+    }
+
+    case 'setNotificationPrefs':
+      return { ...state, notificationPrefs: { ...state.notificationPrefs, [me.id]: action.prefs } }
+
+    case 'sendFeedback': {
+      const text = action.text.trim()
+      if (!text) return state
+      return { ...state, feedback: [{ id: action.id, authorId: me.id, topic: action.topic, text, createdAt: action.now }, ...state.feedback] }
     }
 
     case 'colleagueLikesComment': {

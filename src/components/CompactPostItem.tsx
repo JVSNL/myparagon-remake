@@ -3,6 +3,7 @@ import type { Post } from '../data/types'
 import { usePreferences } from '../lib/preferences'
 import { formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
+import { postContent } from '../store/selectors'
 import { PostImage } from './PostImage'
 import { ReactionSummary } from './reactions/ReactionSummary'
 
@@ -10,6 +11,7 @@ import { ReactionSummary } from './reactions/ReactionSummary'
 export function CompactPostItem({ post }: { post: Post }) {
   const { locale } = usePreferences()
   const now = useNow()
+  const content = postContent(post, locale)
   return (
     <Link
       to={`/news/${post.id}`}
@@ -17,8 +19,8 @@ export function CompactPostItem({ post }: { post: Post }) {
     >
       <PostImage image={post.image} className="aspect-square w-20 shrink-0 rounded-lg sm:w-28 sm:aspect-[4/3]" />
       <span className="min-w-0 flex-1">
-        <span className="line-clamp-2 font-medium text-heading">{post.title}</span>
-        <span className="mt-0.5 line-clamp-2 text-sm text-muted">{post.intro}</span>
+        <span className="line-clamp-2 font-medium text-heading">{content.title}</span>
+        <span className="mt-0.5 line-clamp-2 text-sm text-muted">{content.intro}</span>
         <span className="mt-1.5 flex items-center gap-3 text-xs text-muted">
           {formatRelative(post.createdAt, now, locale)}
           <ReactionSummary post={post} />
