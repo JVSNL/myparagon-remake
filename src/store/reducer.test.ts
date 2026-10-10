@@ -160,6 +160,31 @@ describe('bookmarks and notifications', () => {
   })
 })
 
+describe('profiles and regions', () => {
+  it('lets you edit your own profile, trimmed and with unique skills', () => {
+    const me = DEMO_ACCOUNTS.employee
+    const state = run(signedIn(), {
+      type: 'updateProfile',
+      userId: me,
+      changes: { jobTitle: '  Senior Analyst ', skills: ['Excel', ' Excel', '', 'SQL'] },
+    })
+    expect(state.users.find((u) => u.id === me)).toMatchObject({ jobTitle: 'Senior Analyst', skills: ['Excel', 'SQL'] })
+  })
+
+  it('refuses empty names and other people’s profiles (unless admin)', () => {
+    const state = signedIn()
+    expect(run(state, { type: 'updateProfile', userId: DEMO_ACCOUNTS.employee, changes: { firstName: ' ' } })).toBe(state)
+    expect(run(state, { type: 'updateProfile', userId: 'u01', changes: { bio: 'x' } })).toBe(state)
+    const admin = run(signedIn(DEMO_ACCOUNTS.admin), { type: 'updateProfile', userId: 'u01', changes: { bio: 'Nieuw' } })
+    expect(admin.users.find((u) => u.id === 'u01')?.bio).toBe('Nieuw')
+  })
+
+  it('remembers the chosen region per user', () => {
+    const state = run(signedIn(), { type: 'chooseRegion', region: 'dach' })
+    expect(state.regionChoice[DEMO_ACCOUNTS.employee]).toBe('dach')
+  })
+})
+
 describe('publishing', () => {
   const input = {
     channelId: 'c-company',

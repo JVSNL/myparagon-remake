@@ -276,13 +276,16 @@ export function BlockView({ block }: { block: Block }) {
               if (!user) return null
               return (
                 <li key={id}>
-                  <div className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+                  <Link
+                    to={`/people/${id}`}
+                    className="flex items-center gap-3 rounded-xl border border-border bg-surface p-3 hover:bg-surface-2"
+                  >
                     <Avatar user={user} size="md" />
                     <span className="min-w-0">
                       <span className="block truncate font-medium text-heading">{fullName(user)}</span>
                       <span className="block truncate text-sm text-muted">{user.jobTitle}</span>
                     </span>
-                  </div>
+                  </Link>
                 </li>
               )
             })}

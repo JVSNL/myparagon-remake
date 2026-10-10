@@ -1,9 +1,11 @@
 import { NavLink } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
+import { useRegion } from '../../lib/useRegion'
 import { TAB_ITEMS } from './navItems'
 
 export function TabBar() {
   const t = useT()
+  const region = useRegion()
   return (
     <nav
       aria-label={t('nav.main')}
@@ -30,7 +32,7 @@ export function TabBar() {
                   >
                     <Icon className="size-5" strokeWidth={isActive ? 2.25 : 1.75} aria-hidden="true" />
                   </span>
-                  {t(label)}
+                  {to === '/region' ? region.name : t(label)}
                 </>
               )}
             </NavLink>

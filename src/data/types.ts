@@ -17,6 +17,8 @@ export interface User {
   skills: string[]
   /** User id of the manager; null for the top of the organisation. Used by the org chart. */
   managerId: string | null
+  /** Own profile photo; without one an illustrated avatar is shown. */
+  photo?: { kind: 'upload'; id: string; alt: string }
 }
 
 export interface Channel {

@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
+import { useRegion } from '../../lib/useRegion'
 import { fullName, unreadCount } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 import { Avatar } from '../Avatar'
@@ -9,6 +10,7 @@ import { SIDEBAR_ITEMS } from './navItems'
 export function Sidebar() {
   const t = useT()
   const { state, me } = useStore()
+  const region = useRegion()
   const unread = me ? unreadCount(state, me.id) : 0
 
   return (
@@ -30,7 +32,7 @@ export function Sidebar() {
                 }
               >
                 <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
-                <span className="flex-1">{t(label)}</span>
+                <span className="flex-1">{to === '/region' ? region.name : t(label)}</span>
                 {to === '/notifications' && unread > 0 && (
                   <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
                     <span aria-hidden="true">{unread}</span>
