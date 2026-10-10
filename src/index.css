@@ -50,6 +50,22 @@
   --c-berry: #85406b;
   --c-berry-soft: #f3e2ec;
   --c-berry-text: #7a3a62;
+  /* Deep shades carry white text (≥ 5.9:1) and bright shades sit on them (≥ 4.6:1 on navy).
+     They are the same in both themes, for coloured headers and the sidebar. */
+  --c-navy-deep: #134d71;
+  --c-navy-bright: #9fd0f0;
+  --c-royal-deep: #17699c;
+  --c-royal-bright: #8fcdf5;
+  --c-sky-deep: #136b93;
+  --c-sky-bright: #8fd6f5;
+  --c-orange-deep: #8f5300;
+  --c-orange-bright: #f5bd6b;
+  --c-sienna-deep: #9a4f02;
+  --c-sienna-bright: #f1aa74;
+  --c-sage-deep: #00634f;
+  --c-sage-bright: #8fd3bd;
+  --c-berry-deep: #7a3a62;
+  --c-berry-bright: #e5aacb;
   color-scheme: light;
 }
 
@@ -138,6 +154,20 @@
   --color-c-berry: var(--c-berry);
   --color-c-berry-soft: var(--c-berry-soft);
   --color-c-berry-text: var(--c-berry-text);
+  --color-c-navy-deep: var(--c-navy-deep);
+  --color-c-navy-bright: var(--c-navy-bright);
+  --color-c-royal-deep: var(--c-royal-deep);
+  --color-c-royal-bright: var(--c-royal-bright);
+  --color-c-sky-deep: var(--c-sky-deep);
+  --color-c-sky-bright: var(--c-sky-bright);
+  --color-c-orange-deep: var(--c-orange-deep);
+  --color-c-orange-bright: var(--c-orange-bright);
+  --color-c-sienna-deep: var(--c-sienna-deep);
+  --color-c-sienna-bright: var(--c-sienna-bright);
+  --color-c-sage-deep: var(--c-sage-deep);
+  --color-c-sage-bright: var(--c-sage-bright);
+  --color-c-berry-deep: var(--c-berry-deep);
+  --color-c-berry-bright: var(--c-berry-bright);
 
   --shadow-card: var(--shadow);
 }
@@ -209,4 +239,24 @@ body {
 
 .pt-safe {
   padding-top: env(safe-area-inset-top);
+}
+
+/*
+ * Content on a deep brand colour (coloured headers, the sidebar): re-scope the
+ * semantic tokens so regular components (buttons, badges, links) turn light.
+ * The element sets --brand-bg to its background colour.
+ */
+.on-brand {
+  --surface: var(--brand-bg);
+  --surface-2: rgb(255 255 255 / 0.14);
+  --border: rgb(255 255 255 / 0.2);
+  --text: #ffffff;
+  --heading: #ffffff;
+  --muted: rgb(255 255 255 / 0.82);
+  --primary: #ffffff;
+  --primary-hover: rgb(255 255 255 / 0.88);
+  --on-primary: var(--brand-bg);
+  --link: #ffffff;
+  --focus: #ffffff;
+  color: #ffffff;
 }

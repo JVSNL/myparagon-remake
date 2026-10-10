@@ -1,27 +1,28 @@
 import { Bookmark, MessageCircle, Pencil, SmilePlus } from 'lucide-react'
 import { canEditContent } from '../store/permissions'
 import { useEffect, useRef, useState } from 'react'
+import type { Post } from '../data/types'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { ChannelTag } from '../components/ChannelTag'
 import { PostImage } from '../components/PostImage'
-import { Avatar } from '../components/Avatar'
 import { CommentSection } from '../components/comments/CommentSection'
 import { PageHeader } from '../components/layout/PageHeader'
 import { ReactionChips } from '../components/reactions/ReactionChips'
 import { ReactionPicker } from '../components/reactions/ReactionPicker'
 import { usePreferences } from '../lib/preferences'
 import { formatFull } from '../lib/time'
-import { channelName, fullName, isBookmarked, postContent, userById } from '../store/selectors'
+import { channelName, isBookmarked, userById } from '../store/selectors'
+import { usePostContent } from '../lib/usePostContent'
+import { TranslationNote } from '../components/TranslationNote'
+import { AvatarLink, PersonLink } from '../components/PersonLink'
 import { useStore } from '../store/StoreProvider'
 
 export function ArticlePage() {
   const { postId = '' } = useParams()
   const [params] = useSearchParams()
   const highlight = params.get('comment')
-  const { t, locale } = usePreferences()
-  const { state, me, actions } = useStore()
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const formRef = useRef<HTMLDivElement>(null)
+  const t = usePreferences().t
+  const { state } = useStore()
   const post = state.posts.find((p) => p.id === postId)
 
   useEffect(() => {
@@ -37,8 +38,16 @@ export function ArticlePage() {
     )
   }
 
+  return <Article post={post} highlight={highlight} />
+}
+
+function Article({ post, highlight }: { post: Post; highlight: string | null }) {
+  const { t, locale } = usePreferences()
+  const { state, me, actions } = useStore()
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const formRef = useRef<HTMLDivElement>(null)
+  const { content, translation } = usePostContent(post)
   const author = userById(state, post.authorId)
-  const content = postContent(post, locale)
   const saved = !!me && isBookmarked(state, me.id, post.id)
   const myReactions = me ? Object.keys(post.reactions).filter((e) => post.reactions[e].includes(me.id)) : []
 
@@ -73,12 +82,15 @@ export function ArticlePage() {
         <ChannelTag channelId={post.channelId} className="mt-5" />
         <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{content.title}</h1>
         {content.intro && <p className="mt-3 text-lg leading-relaxed text-text">{content.intro}</p>}
+        <TranslationNote translation={translation} className="mt-3" />
 
         {author && (
           <div className="mt-5 flex items-center gap-3 border-y border-border py-3">
-            <Avatar user={author} size="md" />
+            <AvatarLink user={author} size="md" />
             <div className="text-sm">
-              <p className="font-medium text-heading">{fullName(author)}</p>
+              <p className="font-medium text-heading">
+                <PersonLink user={author} />
+              </p>
               <p className="text-muted">
                 {author.jobTitle} ·{' '}
                 <time dateTime={new Date(post.createdAt).toISOString()}>{formatFull(post.createdAt, locale)}</time>

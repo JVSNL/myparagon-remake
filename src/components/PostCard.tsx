@@ -4,7 +4,9 @@ import type { Post } from '../data/types'
 import { usePreferences } from '../lib/preferences'
 import { formatFull, formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
-import { commentCount, postContent } from '../store/selectors'
+import { usePostContent } from '../lib/usePostContent'
+import { COLOR_CLASSES } from '../lib/colors'
+import { channelColor, commentCount } from '../store/selectors'
 import { ChannelTag } from './ChannelTag'
 import { useStore } from '../store/StoreProvider'
 import { PostImage } from './PostImage'
@@ -15,11 +17,13 @@ export function PostCard({ post }: { post: Post }) {
   const { state } = useStore()
   const now = useNow()
   const comments = commentCount(state, post.id)
-  const content = postContent(post, locale)
+  const { content } = usePostContent(post, { summary: true })
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-border bg-surface shadow-card transition-shadow hover:shadow-lg">
       <PostImage image={post.image} className="aspect-[16/9] w-full" />
+      {/* Accent bar in the channel colour */}
+      <span className={`block h-1 ${COLOR_CLASSES[channelColor(state, post.channelId)].solid}`} aria-hidden="true" />
       <div className="p-4 sm:p-5">
         <p className="text-[13px] text-muted">
           <ChannelTag channelId={post.channelId} className="mr-1.5" />

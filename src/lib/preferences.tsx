@@ -12,6 +12,8 @@ export type ThemePref = 'system' | 'light' | 'dark'
 interface Prefs {
   language: LanguagePref
   theme: ThemePref
+  /** Show posts and comments in the reader's language when a translation is available. */
+  autoTranslate: boolean
 }
 
 const KEY = 'mynexora:prefs'
@@ -33,6 +35,7 @@ interface PreferencesValue extends Prefs {
   isDark: boolean
   setLanguage: (language: LanguagePref) => void
   setTheme: (theme: ThemePref) => void
+  setAutoTranslate: (on: boolean) => void
   t: (key: MessageKey, params?: Params) => string
 }
 
@@ -46,7 +49,7 @@ const prefersDark = () => {
 }
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
-  const [prefs, setPrefs] = useState<Prefs>(() => ({ language: 'auto', theme: 'system', ...readJson<Prefs>(KEY) }))
+  const [prefs, setPrefs] = useState<Prefs>(() => ({ language: 'auto', theme: 'system', autoTranslate: true, ...readJson<Prefs>(KEY) }))
   const [systemDark, setSystemDark] = useState(prefersDark)
 
   useEffect(() => {
@@ -70,7 +73,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', isDark)
     document.documentElement.lang = locale
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', isDark ? '#13222d' : '#ffffff')
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', '#134d71')
   }, [isDark, locale])
 
   const t = useCallback(
@@ -85,6 +88,7 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
       isDark,
       setLanguage: (language) => setPrefs((p) => ({ ...p, language })),
       setTheme: (theme) => setPrefs((p) => ({ ...p, theme })),
+      setAutoTranslate: (autoTranslate) => setPrefs((p) => ({ ...p, autoTranslate })),
       t,
     }),
     [prefs, locale, isDark, t],

@@ -1,7 +1,7 @@
 import { Send } from 'lucide-react'
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { Avatar } from '../../components/Avatar'
+import { AvatarLink, PersonLink } from '../../components/PersonLink'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { usePreferences } from '../../lib/preferences'
 import { conversationTitle } from '../../store/selectors'
@@ -59,7 +59,11 @@ export function ChatThreadPage() {
 
   return (
     <>
-      <PageHeader title={conversationTitle(state, conversation, me.id)} backTo="/chat" />
+      <PageHeader
+        title={conversationTitle(state, conversation, me.id)}
+        backTo="/chat"
+        actions={other && <AvatarLink user={other} size="sm" className="mr-1" />}
+      />
       <div className="mx-auto flex max-w-2xl flex-col px-4 pt-3 lg:pt-0">
         <p className="mb-4 text-center text-xs text-muted">
           {other ? (
@@ -87,7 +91,7 @@ export function ChatThreadPage() {
                 )}
                 <div className={`flex items-end gap-2 ${mine ? 'justify-end' : ''} ${firstOfRun && !newDay ? 'mt-3' : ''}`}>
                   {!mine && conversation.kind === 'group' && (
-                    <span className="w-8 shrink-0">{firstOfRun && author && <Avatar user={author} size="sm" />}</span>
+                    <span className="w-8 shrink-0">{firstOfRun && author && <AvatarLink user={author} size="sm" />}</span>
                   )}
                   <div
                     className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${
@@ -95,7 +99,7 @@ export function ChatThreadPage() {
                     }`}
                   >
                     {!mine && conversation.kind === 'group' && firstOfRun && (
-                      <p className="text-xs font-medium text-primary">{author?.firstName}</p>
+                      <p className="text-xs font-medium text-primary">{author && <PersonLink user={author}>{author.firstName}</PersonLink>}</p>
                     )}
                     <p className="text-[15px] break-words whitespace-pre-line">{m.text}</p>
                     <p className={`mt-0.5 text-right text-[11px] ${mine ? 'text-on-primary/75' : 'text-muted'}`}>

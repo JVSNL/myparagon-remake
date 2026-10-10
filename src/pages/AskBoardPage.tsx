@@ -1,15 +1,14 @@
 import { CheckCircle2, Clock, Lock } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useLocation } from 'react-router-dom'
-import { Avatar } from '../components/Avatar'
+import { AvatarLink, PersonLink } from '../components/PersonLink'
 import { fieldClass } from '../components/ImagePicker'
 import { PageHeader } from '../components/layout/PageHeader'
-import type { Question } from '../data/types'
+import type { Question, User } from '../data/types'
 import { usePreferences } from '../lib/preferences'
 import { formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
 import { canAnswerQuestions } from '../store/permissions'
-import { fullName } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 type Tab = 'all' | 'mine' | 'open'
@@ -40,6 +39,19 @@ function AnswerForm({ question }: { question: Question }) {
   )
 }
 
+/** "Answer from {name}", with the name linking to the profile. */
+function AnswerBy({ user }: { user: User }) {
+  const t = usePreferences().t
+  const [before, after = ''] = t('ask.answerBy', { name: '\u0000' }).split('\u0000')
+  return (
+    <>
+      {before}
+      <PersonLink user={user} />
+      {after}
+    </>
+  )
+}
+
 function QuestionCard({ question, showAnswerForm }: { question: Question; showAnswerForm: boolean }) {
   const { t, locale } = usePreferences()
   const { state } = useStore()
@@ -50,8 +62,8 @@ function QuestionCard({ question, showAnswerForm }: { question: Question; showAn
   return (
     <article id={`q-${question.id}`} className="rounded-xl border border-border bg-surface p-4 shadow-card">
       <div className="flex items-center gap-2 text-sm">
-        {author && <Avatar user={author} size="sm" />}
-        <span className="font-medium text-heading">{author ? fullName(author) : '?'}</span>
+        {author && <AvatarLink user={author} size="sm" />}
+        <span className="font-medium text-heading">{author ? <PersonLink user={author} /> : '?'}</span>
         <span className="text-muted">· {formatRelative(question.createdAt, now, locale)}</span>
       </div>
       <p className="mt-2 text-[16px] text-text">{question.text}</p>
@@ -76,7 +88,9 @@ function QuestionCard({ question, showAnswerForm }: { question: Question; showAn
       </div>
       {question.answer && (
         <div className="mt-3 rounded-lg border-l-4 border-primary bg-primary-soft/60 px-3.5 py-3">
-          <p className="text-sm font-medium text-heading">{t('ask.answerBy', { name: answerer ? fullName(answerer) : '?' })}</p>
+          <p className="text-sm font-medium text-heading">
+            {answerer ? <AnswerBy user={answerer} /> : t('ask.answerBy', { name: '?' })}
+          </p>
           <p className="mt-1 text-[15px] text-text">{question.answer.text}</p>
         </div>
       )}

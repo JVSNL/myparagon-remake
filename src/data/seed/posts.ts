@@ -1,5 +1,6 @@
 import type { ArtworkPalette, Channel, Comment, Post, Reactions } from '../types'
 import { mulberry32 } from '../../lib/random'
+import { POST_TRANSLATIONS, COMMENT_TRANSLATIONS } from './translations'
 import { userId } from './users'
 
 export const seedChannels = (): Channel[] => [
@@ -176,28 +177,6 @@ const POSTS: PostSeed[] = [
   },
 ]
 
-// Some posts are also available in English/German, to show multilingual content.
-const TRANSLATIONS: Record<number, Post['translations']> = {
-  4: {
-    en: {
-      title: 'Welcome to the new myNexora app',
-      intro: 'A fresh, faster app with news, colleagues and everything you need in one place.',
-      body: [
-        'From today the renewed myNexora app is available. We listened carefully to your feedback: the app is clearer, faster and works just as well on your phone as on your laptop.',
-        'React to posts with any emoji you like, save articles for later and keep track of what is new for you via the bell.',
-      ],
-    },
-    de: {
-      title: 'Willkommen in der neuen myNexora-App',
-      intro: 'Eine frische, schnellere App mit News, Kolleginnen und Kollegen und allem, was du brauchst.',
-      body: [
-        'Ab heute ist die erneuerte myNexora-App verfügbar. Wir haben euer Feedback ernst genommen: Die App ist übersichtlicher, schneller und funktioniert auf dem Handy genauso gut wie am Laptop.',
-        'Reagiere mit jedem beliebigen Emoji, speichere Artikel für später und behalte über die Glocke im Blick, was neu ist.',
-      ],
-    },
-  },
-}
-
 const EMOJIS = ['👍', '🎉', '❤️', '💡', '🙏', '😂', '🚀']
 const HOUR = 3_600_000
 
@@ -218,18 +197,22 @@ const seedReactions = (rand: () => number): Reactions => {
 
 export const seedPosts = (now: number): Post[] => {
   const rand = mulberry32(42)
-  return POSTS.map((p, i) => ({
-    id: `p${String(i + 1).padStart(2, '0')}`,
-    channelId: p.channel,
-    authorId: userId(p.author),
-    title: p.title,
-    intro: p.intro,
-    body: p.body,
-    image: { kind: 'artwork', seed: 7 + i * 13, palette: p.palette },
-    ...(TRANSLATIONS[i] ? { translations: TRANSLATIONS[i] } : {}),
-    createdAt: now - p.hoursAgo * HOUR,
-    reactions: seedReactions(rand),
-  }))
+  return POSTS.map((p, i) => {
+    const id = `p${String(i + 1).padStart(2, '0')}`
+    return {
+      id,
+      channelId: p.channel,
+      authorId: userId(p.author),
+      title: p.title,
+      intro: p.intro,
+      body: p.body,
+      image: { kind: 'artwork', seed: 7 + i * 13, palette: p.palette },
+      createdAt: now - p.hoursAgo * HOUR,
+      reactions: seedReactions(rand),
+      lang: 'nl',
+      ...(POST_TRANSLATIONS[id] ? { translations: POST_TRANSLATIONS[id] } : {}),
+    }
+  })
 }
 
 interface CommentSeed {
@@ -294,6 +277,11 @@ const COMMENTS: CommentSeed[] = [
   },
 ]
 
+const commentLang = (text: string) => ({
+  lang: 'nl' as const,
+  ...(COMMENT_TRANSLATIONS[text] ? { translations: COMMENT_TRANSLATIONS[text] } : {}),
+})
+
 export const seedComments = (posts: Post[]): Comment[] => {
   const createdAtOf = (postId: string) => posts.find((p) => p.id === postId)?.createdAt ?? 0
   const rand = mulberry32(7)
@@ -316,6 +304,7 @@ export const seedComments = (posts: Post[]): Comment[] => {
       editedAt: null,
       deleted: false,
       likes: likes(),
+      ...commentLang(c.text),
     })
     for (const r of c.replies ?? []) {
       out.push({
@@ -328,6 +317,7 @@ export const seedComments = (posts: Post[]): Comment[] => {
         editedAt: null,
         deleted: false,
         likes: likes(),
+        ...commentLang(r.text),
       })
     }
   }

@@ -16,11 +16,22 @@ export function Sidebar() {
   const chats = me ? unreadChats(state, me.id) : 0
 
   return (
-    <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
-      <Link to="/" className="mb-8 px-3">
-        <Logo />
+    <aside
+      className={`on-brand ${COLOR_CLASSES.navy.brandVar} sticky top-0 hidden h-dvh w-64 shrink-0 flex-col overflow-hidden bg-(--brand-bg) px-4 py-6 lg:flex`}
+    >
+      {/* Decorative shapes in house-style colours */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-16 -left-12 size-48 rounded-full bg-c-sky/20"
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-28 -right-8 size-16 rounded-full bg-c-orange"
+      />
+      <Link to="/" className="relative mb-8 px-3">
+        <Logo inverse />
       </Link>
-      <nav aria-label={t('nav.main')} className="flex-1">
+      <nav aria-label={t('nav.main')} className="relative flex-1">
         <ul className="space-y-1">
           {SIDEBAR_ITEMS.map(({ to, label, icon: Icon, end, color }) => (
             <li key={to}>
@@ -29,23 +40,35 @@ export function Sidebar() {
                 end={end}
                 className={({ isActive }) =>
                   `flex items-center gap-3 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors ${
-                    isActive ? `${COLOR_CLASSES[color].soft} ${COLOR_CLASSES[color].text}` : 'text-text hover:bg-surface-2'
+                    isActive ? 'bg-white/15 text-white' : 'text-white/85 hover:bg-white/10 hover:text-white'
                   }`
                 }
               >
-                <Icon className={`size-5 ${COLOR_CLASSES[color].text}`} strokeWidth={1.75} aria-hidden="true" />
-                <span className="flex-1">{to === '/region' ? region.name : t(label)}</span>
-                {to === '/general' && chats > 0 && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
-                    <span aria-hidden="true">{chats}</span>
-                    <span className="sr-only">{t('chat.unread', { n: chats })}</span>
-                  </span>
-                )}
-                {to === '/notifications' && unread > 0 && (
-                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
-                    <span aria-hidden="true">{unread}</span>
-                    <span className="sr-only">{t('notifications.unread', { n: unread })}</span>
-                  </span>
+                {({ isActive }) => (
+                  <>
+                    <span
+                      className={`flex size-8 items-center justify-center rounded-lg ${
+                        isActive
+                          ? `bg-white ${COLOR_CLASSES[color].text}`
+                          : `bg-white/10 ${COLOR_CLASSES[color].bright}`
+                      }`}
+                    >
+                      <Icon className="size-[18px]" strokeWidth={1.75} aria-hidden="true" />
+                    </span>
+                    <span className="flex-1">{to === '/region' ? region.name : t(label)}</span>
+                    {to === '/general' && chats > 0 && (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
+                        <span aria-hidden="true">{chats}</span>
+                        <span className="sr-only">{t('chat.unread', { n: chats })}</span>
+                      </span>
+                    )}
+                    {to === '/notifications' && unread > 0 && (
+                      <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
+                        <span aria-hidden="true">{unread}</span>
+                        <span className="sr-only">{t('notifications.unread', { n: unread })}</span>
+                      </span>
+                    )}
+                  </>
                 )}
               </NavLink>
             </li>
@@ -53,7 +76,7 @@ export function Sidebar() {
         </ul>
       </nav>
       {me && (
-        <Link to="/settings" className="flex items-center gap-3 rounded-lg p-2 hover:bg-surface-2">
+        <Link to="/settings" className="relative flex items-center gap-3 rounded-lg p-2 hover:bg-white/10">
           <Avatar user={me} size="md" />
           <span className="min-w-0">
             <span className="block truncate text-sm font-medium text-text">{fullName(me)}</span>

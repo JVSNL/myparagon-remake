@@ -226,7 +226,7 @@ export function AdminPage() {
                           {channelName(state, post.channelId)} · {date(post.createdAt)}
                         </span>
                       </span>
-                      <LangBadges available={['nl', ...Object.keys(post.translations ?? {})]} />
+                      <LangBadges available={[post.lang ?? 'nl', ...Object.keys(post.translations ?? {})]} />
                     </Link>
                   </li>
                 ))}

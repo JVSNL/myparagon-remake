@@ -18,12 +18,12 @@ export function PostEditorPage() {
   const navigate = useNavigate()
   const { state, me, actions } = useStore()
   const post = state.posts.find((p) => p.id === postId)
-  const [lang, setLang] = useState<Lang>('nl')
-  const [forms, setForms] = useState(() => ({
-    nl: toForm(post),
-    en: toForm(post?.translations?.en),
-    de: toForm(post?.translations?.de),
-  }))
+  // The language the post was written in; the other languages are translations.
+  const source: Lang = post?.lang ?? 'nl'
+  const [lang, setLang] = useState<Lang>(source)
+  const [forms, setForms] = useState(
+    () => Object.fromEntries(LANGUAGES.map((l) => [l, toForm(l === source ? post : post?.translations?.[l])])) as Record<Lang, ReturnType<typeof toForm>>,
+  )
   const [image, setImage] = useState<ImageRef | undefined>(post?.image)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(false)
@@ -38,12 +38,12 @@ export function PostEditorPage() {
     setSaved(false)
     setError(false)
   }
-  const exists = lang === 'nl' || !!post.translations?.[lang]
+  const exists = lang === source || !!post.translations?.[lang]
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
     if (!form.title.trim()) return setError(true)
-    actions.updatePost(post.id, lang, { title: form.title, intro: form.intro, body: form.body.split(/\n\s*\n/) }, lang === 'nl' ? image : undefined)
+    actions.updatePost(post.id, lang, { title: form.title, intro: form.intro, body: form.body.split(/\n\s*\n/) }, lang === source ? image : undefined)
     setSaved(true)
   }
 
@@ -73,20 +73,20 @@ export function PostEditorPage() {
               className={`flex-1 rounded-lg py-2 text-sm font-medium ${lang === l ? 'bg-surface text-primary shadow-card' : 'text-muted hover:text-text'}`}
             >
               {t(`lang.${l}`)}
-              {l !== 'nl' && !post.translations?.[l] && <span className="ml-1 text-xs font-normal">({t('editor.missing')})</span>}
+              {l !== source && !post.translations?.[l] && <span className="ml-1 text-xs font-normal">({t('editor.missing')})</span>}
             </button>
           ))}
         </div>
 
         {!exists && !form.title && (
           <div className="rounded-xl border border-dashed border-border bg-surface p-4 text-center">
-            <p className="text-sm text-muted">{t('editor.notTranslated')}</p>
+            <p className="text-sm text-muted">{t('postEdit.notTranslated')}</p>
             <button
               type="button"
-              onClick={() => setForms({ ...forms, [lang]: { ...forms.nl } })}
+              onClick={() => setForms({ ...forms, [lang]: { ...forms[source] } })}
               className="mt-3 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-on-primary"
             >
-              {t('editor.copyFromNl')}
+              {t('editor.copyFromOriginal')}
             </button>
           </div>
         )}
@@ -114,7 +114,7 @@ export function PostEditorPage() {
           </p>
         </div>
 
-        {lang === 'nl' && image && (
+        {lang === source && image && (
           <div>
             <p className="mb-1.5 text-sm font-medium text-heading">{t('compose.artwork')}</p>
             <ImageField value={image} onChange={(next) => (setImage(next), setSaved(false))} />
@@ -126,7 +126,7 @@ export function PostEditorPage() {
             <Trash2 className="size-4" aria-hidden="true" />
             {t('postEdit.delete')}
           </button>
-          {lang !== 'nl' && post.translations?.[lang] && (
+          {lang !== source && post.translations?.[lang] && (
             <button
               type="button"
               onClick={() => {

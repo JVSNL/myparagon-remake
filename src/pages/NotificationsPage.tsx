@@ -1,11 +1,11 @@
 import { BellOff } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { Avatar } from '../components/Avatar'
+import { AvatarLink } from '../components/PersonLink'
 import { PageHeader } from '../components/layout/PageHeader'
 import { usePreferences } from '../lib/preferences'
 import { formatFull, formatRelative } from '../lib/time'
 import { useNow } from '../lib/useNow'
-import { fullName, notificationsFor, unreadCount, userById } from '../store/selectors'
+import { fullName, notificationsFor, postContent, unreadCount, userById } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 export function NotificationsPage() {
@@ -58,15 +58,11 @@ export function NotificationsPage() {
                 : n.commentId
                   ? `/news/${n.postId}?comment=${n.commentId}`
                   : `/news/${n.postId}`
-              const subject = post?.title ?? question?.text
+              const subject = (post && postContent(post, locale).title) ?? question?.text
               return (
-                <li key={n.id}>
-                  <Link
-                    to={href}
-                    onClick={() => actions.markNotificationRead(n.id)}
-                    className={`flex gap-3 px-4 py-3.5 hover:bg-surface-2 ${n.read ? '' : 'bg-primary-soft/50'}`}
-                  >
-                    {actor && <Avatar user={actor} size="md" />}
+                <li key={n.id} className={`flex gap-3 py-3.5 pl-4 hover:bg-surface-2 ${n.read ? '' : 'bg-primary-soft/50'}`}>
+                  {actor && <AvatarLink user={actor} size="md" className="self-start" />}
+                  <Link to={href} onClick={() => actions.markNotificationRead(n.id)} className="flex min-w-0 flex-1 gap-3 pr-4">
                     <span className="min-w-0 flex-1">
                       <span className="block text-[15px] text-text">
                         {t(`notifications.${n.type}`, { name: actor ? fullName(actor) : '?' })}

@@ -1,6 +1,6 @@
 import { useState, type Ref } from 'react'
 import type { Comment } from '../../data/types'
-import { useT } from '../../lib/preferences'
+import { usePreferences } from '../../lib/preferences'
 import { useNow } from '../../lib/useNow'
 import { commentCount, commentsFor, commentThreads, fullName, userById } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
@@ -17,7 +17,7 @@ interface Props {
 }
 
 export function CommentSection({ postId, highlightId, formRef }: Props) {
-  const t = useT()
+  const { t, locale } = usePreferences()
   const { state, actions } = useStore()
   const now = useNow()
   const threads = commentThreads(commentsFor(state, postId))
@@ -70,7 +70,7 @@ export function CommentSection({ postId, highlightId, formRef }: Props) {
                       placeholder={t('comments.replyPlaceholder')}
                       onCancel={() => setReplyTo(null)}
                       onSubmit={(text) => {
-                        actions.addComment(postId, text, replyTo?.id ?? null)
+                        actions.addComment(postId, text, replyTo?.id ?? null, locale)
                         setReplyTo(null)
                       }}
                     />
@@ -83,7 +83,7 @@ export function CommentSection({ postId, highlightId, formRef }: Props) {
       </ul>
 
       <div ref={formRef} className="mt-6 border-t border-border pt-5">
-        <CommentForm placeholder={t('comments.placeholder')} onSubmit={(text) => actions.addComment(postId, text)} />
+        <CommentForm placeholder={t('comments.placeholder')} onSubmit={(text) => actions.addComment(postId, text, null, locale)} />
       </div>
     </section>
   )
