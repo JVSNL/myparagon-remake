@@ -1,6 +1,6 @@
 import { ChevronLeft } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
 import { LogoMark } from '../Logo'
 import { NotificationBell } from './NotificationBell'
@@ -21,7 +21,9 @@ interface Props {
 export function PageHeader({ title, backTo, actions, showLogo }: Props) {
   const t = useT()
   const navigate = useNavigate()
-  const goBack = () => (window.history.length > 1 ? navigate(-1) : navigate(backTo ?? '/'))
+  const location = useLocation()
+  // "default" means this is the first page of the session: nothing to go back to.
+  const goBack = () => (location.key !== 'default' ? navigate(-1) : navigate(backTo ?? '/'))
 
   return (
     <header className="pt-safe sticky top-0 z-20 border-b border-border bg-surface/95 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:backdrop-blur-none">

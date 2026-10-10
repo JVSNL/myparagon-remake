@@ -19,6 +19,7 @@ npm install
 npm run dev       # http://localhost:5173
 npm run check     # lint + typecheck + tests
 npm run build
+npm run build:demo  # single self-contained HTML file in dist-demo/ to share as a clickable demo
 ```
 
 Sign in with one of the demo accounts on the login screen (employee, editor or admin),

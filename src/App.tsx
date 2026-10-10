@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { AppShell } from './components/layout/AppShell'
 import { PreferencesProvider } from './lib/preferences'
 import { ArticlePage } from './pages/ArticlePage'
@@ -21,6 +21,9 @@ function ScrollToTop() {
   useEffect(() => window.scrollTo(0, 0), [pathname])
   return null
 }
+
+// The shareable demo build runs inside a host page that owns the URL, so it keeps routes in memory.
+const Router = import.meta.env.VITE_ROUTER === 'memory' ? MemoryRouter : BrowserRouter
 
 export function AppRoutes() {
   return (
@@ -47,10 +50,10 @@ export default function App({ initialState }: { initialState?: AppState }) {
   return (
     <PreferencesProvider>
       <StoreProvider initialState={initialState}>
-        <BrowserRouter>
+        <Router>
           <ScrollToTop />
           <AppRoutes />
-        </BrowserRouter>
+        </Router>
       </StoreProvider>
     </PreferencesProvider>
   )

@@ -38,7 +38,12 @@ interface PreferencesValue extends Prefs {
 
 const PreferencesContext = createContext<PreferencesValue | null>(null)
 
-const prefersDark = () => typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches
+const prefersDark = () => {
+  // A host page (e.g. the demo viewer) may force a theme through data-theme on <html>.
+  const forced = document.documentElement.dataset.theme
+  if (forced === 'dark' || forced === 'light') return forced === 'dark'
+  return typeof matchMedia === 'function' && matchMedia('(prefers-color-scheme: dark)').matches
+}
 
 export function PreferencesProvider({ children }: { children: ReactNode }) {
   const [prefs, setPrefs] = useState<Prefs>(() => ({ language: 'auto', theme: 'system', ...readJson<Prefs>(KEY) }))
@@ -47,9 +52,14 @@ export function PreferencesProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (typeof matchMedia !== 'function') return
     const query = matchMedia('(prefers-color-scheme: dark)')
-    const onChange = () => setSystemDark(query.matches)
+    const onChange = () => setSystemDark(prefersDark())
     query.addEventListener('change', onChange)
-    return () => query.removeEventListener('change', onChange)
+    const observer = new MutationObserver(onChange)
+    observer.observe(document.documentElement, { attributeFilter: ['data-theme'] })
+    return () => {
+      query.removeEventListener('change', onChange)
+      observer.disconnect()
+    }
   }, [])
 
   useEffect(() => writeJson(KEY, prefs), [prefs])

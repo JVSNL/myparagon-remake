@@ -7,6 +7,7 @@ import { canDeleteComment, canEditComment } from '../../store/permissions'
 import { fullName, userById } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 import { Avatar } from '../Avatar'
+import { ConfirmDialog } from '../ConfirmDialog'
 import { CommentForm } from './CommentForm'
 
 interface Props {
@@ -21,6 +22,7 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
   const { state, me, actions } = useStore()
   const [editing, setEditing] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [confirming, setConfirming] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const author = userById(state, comment.authorId)
   const name = author ? fullName(author) : '?'
@@ -108,7 +110,7 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
                           type="button"
                           onClick={() => {
                             setMenuOpen(false)
-                            if (window.confirm(t('comments.confirmDelete'))) actions.deleteComment(comment.id)
+                            setConfirming(true)
                           }}
                           className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-danger hover:bg-surface-2"
                         >
@@ -121,6 +123,14 @@ export function CommentItem({ comment, now, onReply, highlighted }: Props) {
                 </div>
               )}
             </div>
+            <ConfirmDialog
+              open={confirming}
+              title={t('comments.delete')}
+              message={t('comments.confirmDelete')}
+              confirmLabel={t('comments.delete')}
+              onConfirm={() => actions.deleteComment(comment.id)}
+              onClose={() => setConfirming(false)}
+            />
             <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 pl-1 text-[13px] text-muted">
               <button
                 type="button"

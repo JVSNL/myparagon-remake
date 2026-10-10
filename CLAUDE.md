@@ -32,4 +32,6 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
   enforced in the reducer, not only in the UI.
 - Text: every UI string goes through `t()`; add keys to `nl.ts`, `en.ts` and `de.ts`
   (a test checks they stay in sync). UI language follows the browser unless set in Settings.
+- Never use `window.alert/confirm/prompt`; use `ConfirmDialog` (they are blocked in the shared demo viewer).
+- `npm run build:demo` builds the shareable single-file demo (memory router, everything inlined).
 - Seed content is Dutch. Keep the seed deterministic (`src/lib/random.ts`).

@@ -1,5 +1,7 @@
 import { Info, LogOut, Monitor, Moon, RotateCcw, Sparkles, Sun, type LucideIcon } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ConfirmDialog } from '../components/ConfirmDialog'
 import { PageHeader } from '../components/layout/PageHeader'
 import { ListGroup, ListRow } from '../components/List'
 import { detectLanguage, LANGUAGES, usePreferences, type LanguagePref, type ThemePref } from '../lib/preferences'
@@ -51,6 +53,7 @@ export function SettingsPage() {
   const { t, theme, setTheme, language, setLanguage } = usePreferences()
   const { me, actions } = useStore()
   const navigate = useNavigate()
+  const [confirmReset, setConfirmReset] = useState(false)
   if (!me) return null
 
   const languageOptions: { value: LanguagePref; label: string }[] = [
@@ -111,16 +114,22 @@ export function SettingsPage() {
             icon={RotateCcw}
             label={t('settings.resetDemo')}
             tone="danger"
-            onClick={() => {
-              if (window.confirm(t('settings.resetConfirm'))) {
-                actions.resetDemo()
-                navigate('/login')
-              }
-            }}
+            onClick={() => setConfirmReset(true)}
           />
         </ListGroup>
         <p className="px-1 text-sm text-muted">{t('settings.demoNotice')}</p>
       </div>
+      <ConfirmDialog
+        open={confirmReset}
+        title={t('settings.resetDemo')}
+        message={t('settings.resetConfirm')}
+        confirmLabel={t('settings.resetDemo')}
+        onConfirm={() => {
+          actions.resetDemo()
+          navigate('/login')
+        }}
+        onClose={() => setConfirmReset(false)}
+      />
     </>
   )
 }
