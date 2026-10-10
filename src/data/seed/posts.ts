@@ -173,6 +173,28 @@ const POSTS: PostSeed[] = [
   },
 ]
 
+// Some posts are also available in English/German, to show multilingual content.
+const TRANSLATIONS: Record<number, Post['translations']> = {
+  4: {
+    en: {
+      title: 'Welcome to the new myNexora app',
+      intro: 'A fresh, faster app with news, colleagues and everything you need in one place.',
+      body: [
+        'From today the renewed myNexora app is available. We listened carefully to your feedback: the app is clearer, faster and works just as well on your phone as on your laptop.',
+        'React to posts with any emoji you like, save articles for later and keep track of what is new for you via the bell.',
+      ],
+    },
+    de: {
+      title: 'Willkommen in der neuen myNexora-App',
+      intro: 'Eine frische, schnellere App mit News, Kolleginnen und Kollegen und allem, was du brauchst.',
+      body: [
+        'Ab heute ist die erneuerte myNexora-App verfügbar. Wir haben euer Feedback ernst genommen: Die App ist übersichtlicher, schneller und funktioniert auf dem Handy genauso gut wie am Laptop.',
+        'Reagiere mit jedem beliebigen Emoji, speichere Artikel für später und behalte über die Glocke im Blick, was neu ist.',
+      ],
+    },
+  },
+}
+
 const EMOJIS = ['👍', '🎉', '❤️', '💡', '🙏', '😂', '🚀']
 const HOUR = 3_600_000
 
@@ -201,6 +223,7 @@ export const seedPosts = (now: number): Post[] => {
     intro: p.intro,
     body: p.body,
     image: { kind: 'artwork', seed: 7 + i * 13, palette: p.palette },
+    ...(TRANSLATIONS[i] ? { translations: TRANSLATIONS[i] } : {}),
     createdAt: now - p.hoursAgo * HOUR,
     reactions: seedReactions(rand),
   }))

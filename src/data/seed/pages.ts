@@ -354,6 +354,24 @@ const PAGES: PageSeed[] = [
     ],
   },
   {
+    slug: 'legal',
+    section: 'general',
+    icon: 'scale',
+    title: { nl: 'Juridische documenten', en: 'Legal documents', de: 'Rechtliche Dokumente' },
+    blocks: [
+      { type: 'heading', text: 'Privacyverklaring' },
+      {
+        type: 'text',
+        text: 'myNexora verwerkt alleen de gegevens die nodig zijn om de app te laten werken: je naam, functie, vestiging en de berichten en reacties die je plaatst.\n\nDit is een **demo met fictieve gegevens**: alles wat je doet wordt alleen in je eigen browser bewaard.',
+      },
+      { type: 'heading', text: 'Gebruiksvoorwaarden' },
+      {
+        type: 'text',
+        text: '- Wees respectvol in berichten, reacties en chats\n- Deel geen vertrouwelijke klantgegevens\n- Meld ongepaste inhoud bij de redactie',
+      },
+    ],
+  },
+  {
     slug: 'user-info',
     section: 'general',
     icon: 'file-text',
@@ -379,4 +397,5 @@ export const seedPages = (now: number): Page[] =>
     blocks: { nl: withIds(p.slug, p.blocks), ...(p.blocksEn ? { en: withIds(`${p.slug}-en`, p.blocksEn) } : {}) },
     updatedAt: now - (i + 1) * 86_400_000,
     updatedBy: userId(14),
+    history: [],
   }))

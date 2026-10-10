@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedState } from '../data/seed'
 import { DEMO_ACCOUNTS } from '../data/seed/users'
 import { reducer } from './reducer'
+import { notificationsFor, postContent } from './selectors'
 import type { Action, AppState } from './state'
 
 const NOW = Date.UTC(2026, 9, 10, 12)
@@ -212,6 +213,75 @@ describe('Ask the Board', () => {
     state = run(state, { type: 'boardAnswers', questionId: 'q', authorId: 'u01', text: 'Ja', now: NOW, notificationId: 'n' })
     expect(state.questions.find((q) => q.id === 'q')?.answer).toMatchObject({ text: 'Ja', authorId: 'u01' })
     expect(state.notifications.find((n) => n.id === 'n')).toMatchObject({ userId: DEMO_ACCOUNTS.employee, type: 'question_answered' })
+  })
+})
+
+describe('page editor', () => {
+  const page = (state: AppState) => state.pages.find((p) => p.id === 'pg-strategy')!
+
+  it('keeps drafts separate until publishing, and keeps the old version', () => {
+    let state = signedIn(DEMO_ACCOUNTS.editor)
+    const live = page(state)
+    const content = { title: { nl: 'Nieuwe strategie' }, blocks: { nl: [] } }
+    state = run(state, { type: 'savePageDraft', pageId: live.id, content })
+    expect(page(state).title.nl).toBe('Strategie')
+    expect(page(state).draft?.title.nl).toBe('Nieuwe strategie')
+    state = run(state, { type: 'publishPage', pageId: live.id, versionId: 'v1', now: NOW })
+    expect(page(state)).toMatchObject({ title: { nl: 'Nieuwe strategie' }, draft: undefined, updatedBy: DEMO_ACCOUNTS.editor })
+    expect(page(state).history[0]).toMatchObject({ id: 'v1', title: live.title })
+    state = run(state, { type: 'restorePageVersion', pageId: live.id, versionId: 'v1' })
+    expect(page(state).draft?.title).toEqual(live.title)
+  })
+
+  it('is not available to employees', () => {
+    const state = signedIn()
+    const content = { title: { nl: 'x' }, blocks: { nl: [] } }
+    expect(run(state, { type: 'savePageDraft', pageId: 'pg-strategy', content })).toBe(state)
+  })
+
+  it('creates pages with a unique, valid address', () => {
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    const created = run(editor, { type: 'createPage', id: 'pg-new', slug: 'nieuw', section: 'story', title: 'Nieuw', now: NOW })
+    expect(created.pages.find((p) => p.id === 'pg-new')?.slug).toBe('nieuw')
+    expect(run(editor, { type: 'createPage', id: 'x', slug: 'faq', section: 'story', title: 'Dubbel', now: NOW })).toBe(editor)
+    expect(run(editor, { type: 'createPage', id: 'x', slug: 'Met Spatie', section: 'story', title: 'Fout', now: NOW })).toBe(editor)
+  })
+})
+
+describe('post translations and deletion', () => {
+  it('stores translations next to the Dutch original and removes them again', () => {
+    const content = { title: 'Hello', intro: 'Intro', body: ['One', ' '] }
+    let state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'updatePost', postId: 'p02', lang: 'en', content })
+    const post = () => state.posts.find((p) => p.id === 'p02')!
+    expect(post().translations?.en).toEqual({ title: 'Hello', intro: 'Intro', body: ['One'] })
+    expect(postContent(post(), 'en').title).toBe('Hello')
+    expect(postContent(post(), 'de').title).toBe(post().title)
+    state = run(state, { type: 'removePostTranslation', postId: 'p02', lang: 'en' })
+    expect(post().translations?.en).toBeUndefined()
+  })
+
+  it('deletes a post with its comments', () => {
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'deletePost', postId: 'p01' })
+    expect(state.posts.some((p) => p.id === 'p01')).toBe(false)
+    expect(state.comments.some((c) => c.postId === 'p01')).toBe(false)
+  })
+})
+
+describe('notification settings and feedback', () => {
+  it('hides switched-off notification types', () => {
+    const me = DEMO_ACCOUNTS.employee
+    const before = notificationsFor(signedIn(), me).length
+    const state = run(signedIn(), {
+      type: 'setNotificationPrefs',
+      prefs: { new_post: false, reply: true, comment_like: true, question_answered: true },
+    })
+    expect(before).toBeGreaterThan(0)
+    expect(notificationsFor(state, me).filter((n) => n.type === 'new_post')).toHaveLength(0)
+  })
+
+  it('stores feedback', () => {
+    const state = run(signedIn(), { type: 'sendFeedback', id: 'f1', topic: 'idea', text: ' Donkere modus is top ', now: NOW })
+    expect(state.feedback[0]).toMatchObject({ id: 'f1', text: 'Donkere modus is top', authorId: DEMO_ACCOUNTS.employee })
   })
 })
 

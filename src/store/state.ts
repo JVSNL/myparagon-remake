@@ -4,6 +4,12 @@ import type {
   ChatMessage,
   Comment,
   Conversation,
+  Feedback,
+  Lang,
+  NotificationPrefs,
+  PageContent,
+  PageSection,
+  PostContent,
   ImageRef,
   Location,
   Page,
@@ -34,6 +40,9 @@ export interface AppState {
   /** userId -> conversationId -> time the user last read it. */
   chatRead: Record<string, Record<string, number>>
   questions: Question[]
+  /** Per user; missing means all notification types are on. */
+  notificationPrefs: Record<string, NotificationPrefs>
+  feedback: Feedback[]
 }
 
 export type ProfileChanges = Partial<
@@ -88,4 +97,14 @@ export type Action =
   | { type: 'answerQuestion'; questionId: string; text: string; now: number; notificationId: string }
   /** A (simulated) board member answers a question. */
   | { type: 'boardAnswers'; questionId: string; authorId: string; text: string; now: number; notificationId: string }
+  | { type: 'savePageDraft'; pageId: string; content: PageContent }
+  | { type: 'discardPageDraft'; pageId: string }
+  | { type: 'publishPage'; pageId: string; versionId: string; now: number }
+  | { type: 'restorePageVersion'; pageId: string; versionId: string }
+  | { type: 'createPage'; id: string; slug: string; section: PageSection; title: string; now: number }
+  | { type: 'updatePost'; postId: string; lang: Lang; content: PostContent; image?: ImageRef }
+  | { type: 'removePostTranslation'; postId: string; lang: Exclude<Lang, 'nl'> }
+  | { type: 'deletePost'; postId: string }
+  | { type: 'setNotificationPrefs'; prefs: NotificationPrefs }
+  | { type: 'sendFeedback'; id: string; topic: Feedback['topic']; text: string; now: number }
   | { type: 'reset'; state: AppState }

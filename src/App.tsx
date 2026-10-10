@@ -3,7 +3,11 @@ import { BrowserRouter, MemoryRouter, Route, Routes, useLocation } from 'react-r
 import { AppShell } from './components/layout/AppShell'
 import { PreferencesProvider } from './lib/preferences'
 import { ArticlePage } from './pages/ArticlePage'
+import { AdminPage } from './pages/admin/AdminPage'
+import { PageEditorPage } from './pages/admin/PageEditorPage'
+import { PostEditorPage } from './pages/admin/PostEditorPage'
 import { AskBoardPage } from './pages/AskBoardPage'
+import { FeedbackPage } from './pages/FeedbackPage'
 import { ChatListPage } from './pages/chat/ChatListPage'
 import { ChatThreadPage } from './pages/chat/ChatThreadPage'
 import { NewChatPage } from './pages/chat/NewChatPage'
@@ -66,6 +70,10 @@ export function AppRoutes() {
         <Route path="documents/:documentId" element={<DocumentPage />} />
         <Route path="menu" element={<MenuPage />} />
         <Route path="settings" element={<SettingsPage />} />
+        <Route path="feedback" element={<FeedbackPage />} />
+        <Route path="beheer" element={<AdminPage />} />
+        <Route path="beheer/pages/:pageId" element={<PageEditorPage />} />
+        <Route path="beheer/posts/:postId" element={<PostEditorPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
