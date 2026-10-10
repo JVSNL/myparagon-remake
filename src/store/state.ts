@@ -1,4 +1,4 @@
-import type { AppNotification, Channel, Comment, ImageRef, Location, Page, Post, User } from '../data/types'
+import type { AppNotification, Channel, Comment, ImageRef, Location, Page, Post, RegionId, User } from '../data/types'
 
 export interface AppState {
   version: number
@@ -14,7 +14,13 @@ export interface AppState {
   notifications: AppNotification[]
   pages: Page[]
   locations: Location[]
+  /** Region chosen per user on the Region tab; defaults to the region of their country. */
+  regionChoice: Record<string, RegionId>
 }
+
+export type ProfileChanges = Partial<
+  Pick<User, 'firstName' | 'lastName' | 'jobTitle' | 'department' | 'location' | 'country' | 'email' | 'phone' | 'bio' | 'skills' | 'photo'>
+>
 
 export interface NewPostInput {
   channelId: string
@@ -53,4 +59,6 @@ export type Action =
       notificationId: string
       now: number
     }
+  | { type: 'chooseRegion'; region: RegionId }
+  | { type: 'updateProfile'; userId: string; changes: ProfileChanges }
   | { type: 'reset'; state: AppState }

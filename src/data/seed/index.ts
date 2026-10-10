@@ -5,7 +5,7 @@ import { seedPages } from './pages'
 import { seedChannels, seedComments, seedPosts } from './posts'
 import { seedUsers } from './users'
 
-export const STATE_VERSION = 3
+export const STATE_VERSION = 4
 
 export const buildSeedState = (now: number): AppState => {
   const users = seedUsers()
@@ -41,5 +41,6 @@ export const buildSeedState = (now: number): AppState => {
     notifications,
     pages: seedPages(now),
     locations: seedLocations(),
+    regionChoice: {},
   }
 }

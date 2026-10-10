@@ -5,7 +5,6 @@ import { PreferencesProvider } from './lib/preferences'
 import { ArticlePage } from './pages/ArticlePage'
 import { BookmarksPage } from './pages/BookmarksPage'
 import { ComposePage } from './pages/ComposePage'
-import { ComingSoonPage } from './pages/ComingSoonPage'
 import { ContentPage } from './pages/ContentPage'
 import { DocumentPage } from './pages/DocumentPage'
 import { GeneralPage } from './pages/GeneralPage'
@@ -17,6 +16,11 @@ import { MenuPage } from './pages/MenuPage'
 import { NotFoundPage } from './pages/NotFoundPage'
 import { NotificationsPage } from './pages/NotificationsPage'
 import { OnboardingPage } from './pages/OnboardingPage'
+import { OrgChartPage } from './pages/OrgChartPage'
+import { PeoplePage } from './pages/PeoplePage'
+import { ProfileEditPage } from './pages/ProfileEditPage'
+import { ProfilePage } from './pages/ProfilePage'
+import { RegionPage } from './pages/RegionPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { StoreProvider } from './store/StoreProvider'
 import type { AppState } from './store/state'
@@ -41,7 +45,12 @@ export function AppRoutes() {
         <Route path="news/:postId" element={<ArticlePage />} />
         <Route path="bookmarks" element={<BookmarksPage />} />
         <Route path="notifications" element={<NotificationsPage />} />
-        <Route path="region" element={<ComingSoonPage title="region.title" body="region.soon" phase={3} />} />
+        <Route path="region" element={<RegionPage />} />
+        <Route path="people" element={<PeoplePage />} />
+        <Route path="people/:userId" element={<ProfilePage />} />
+        <Route path="people/:userId/edit" element={<ProfileEditPage />} />
+        <Route path="profile" element={<ProfilePage own />} />
+        <Route path="org" element={<OrgChartPage />} />
         <Route path="general" element={<GeneralPage />} />
         <Route path="pages/:slug" element={<ContentPage />} />
         <Route path="stories" element={<StoriesPage />} />

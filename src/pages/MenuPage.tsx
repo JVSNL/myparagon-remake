@@ -1,4 +1,4 @@
-import { Bell, Bookmark, BookOpen, MapPin, Settings, UserRound, Users } from 'lucide-react'
+import { Bell, Bookmark, BookOpen, MapPin, Network, Settings, UserRound, Users } from 'lucide-react'
 import { pageIcon } from '../components/pageIcons'
 import { pick } from '../lib/localized'
 import { Link } from 'react-router-dom'
@@ -20,7 +20,7 @@ export function MenuPage() {
       <PageHeader title={t('menu.title')} showLogo />
       <div className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
         <Link
-          to="/settings"
+          to="/profile"
           className="mb-6 flex items-center gap-4 rounded-xl border border-border bg-surface p-4 hover:bg-surface-2"
         >
           <Avatar user={me} size="lg" />
@@ -31,6 +31,12 @@ export function MenuPage() {
             </span>
           </span>
         </Link>
+
+        <ListGroup>
+          <ListRow icon={Users} label={t('menu.whoiswho')} to="/people" />
+          <ListRow icon={Network} label={t('org.title')} to="/org" />
+          <ListRow icon={UserRound} label={t('menu.profile')} to="/profile" />
+        </ListGroup>
 
         <ListGroup title={t('menu.divisions')}>
           {state.pages
@@ -61,10 +67,6 @@ export function MenuPage() {
           <ListRow icon={Settings} label={t('nav.settings')} to="/settings" />
         </ListGroup>
 
-        <ListGroup title={t('menu.soon')}>
-          <ListRow icon={UserRound} label={t('menu.profile')} disabled />
-          <ListRow icon={Users} label={t('menu.whoiswho')} disabled />
-        </ListGroup>
         <p className="px-1 text-sm text-muted">{t('menu.phaseNote')}</p>
       </div>
     </>

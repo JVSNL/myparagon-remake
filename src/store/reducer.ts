@@ -151,6 +151,20 @@ export function reducer(state: AppState, action: Action): AppState {
       return { ...state, posts: [post, ...state.posts], notifications: [...notifications, ...state.notifications] }
     }
 
+    case 'chooseRegion':
+      return { ...state, regionChoice: { ...state.regionChoice, [me.id]: action.region } }
+
+    case 'updateProfile': {
+      if (me.id !== action.userId && me.role !== 'admin') return state
+      const changes = { ...action.changes }
+      for (const key of ['firstName', 'lastName', 'jobTitle', 'department', 'location', 'email', 'phone', 'bio'] as const) {
+        if (changes[key] !== undefined) changes[key] = changes[key].trim()
+      }
+      if (changes.firstName === '' || changes.lastName === '') return state
+      if (changes.skills) changes.skills = [...new Set(changes.skills.map((s) => s.trim()).filter(Boolean))]
+      return { ...state, users: state.users.map((u) => (u.id === action.userId ? { ...u, ...changes } : u)) }
+    }
+
     case 'colleagueLikesComment': {
       const comment = state.comments.find((c) => c.id === action.commentId)
       if (!comment || comment.deleted || comment.likes.includes(action.actorId)) return state

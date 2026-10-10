@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, type ReactNode } from 'react'
 import { buildSeedState, STATE_VERSION } from '../data/seed'
-import type { User } from '../data/types'
+import type { RegionId, User } from '../data/types'
 import { clearImages } from '../lib/imageStore'
 import { readJson, writeJson } from '../lib/storage'
 import { reducer } from './reducer'
-import type { Action, AppState, NewPostInput } from './state'
+import type { Action, AppState, NewPostInput, ProfileChanges } from './state'
 
 const KEY = 'mynexora:state'
 
@@ -56,6 +56,8 @@ function createActions(dispatch: (a: Action) => void, simulate: (commentId: stri
       dispatch({ type: 'createPost', id, input, now: Date.now() })
       return id
     },
+    chooseRegion: (region: RegionId) => dispatch({ type: 'chooseRegion', region }),
+    updateProfile: (userId: string, changes: ProfileChanges) => dispatch({ type: 'updateProfile', userId, changes }),
     resetDemo: () => {
       void clearImages()
       dispatch({ type: 'reset', state: buildSeedState(Date.now()) })
