@@ -18,7 +18,7 @@ export const TAB_ITEMS: NavItem[] = [
 
 /** Sidebar on desktop: the tabs plus what lives behind "Menu" on mobile. */
 export const SIDEBAR_ITEMS: NavItem[] = [
-  ...TAB_ITEMS.slice(0, 3),
+  ...TAB_ITEMS,
   { to: '/bookmarks', label: 'nav.bookmarks', icon: Bookmark },
   { to: '/notifications', label: 'nav.notifications', icon: Bell },
   { to: '/settings', label: 'nav.settings', icon: Settings },

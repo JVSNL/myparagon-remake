@@ -1,9 +1,11 @@
 import type { AppNotification } from '../types'
 import type { AppState } from '../../store/state'
+import { seedLocations } from './locations'
+import { seedPages } from './pages'
 import { seedChannels, seedComments, seedPosts } from './posts'
 import { seedUsers } from './users'
 
-export const STATE_VERSION = 2
+export const STATE_VERSION = 3
 
 export const buildSeedState = (now: number): AppState => {
   const users = seedUsers()
@@ -37,5 +39,7 @@ export const buildSeedState = (now: number): AppState => {
     comments,
     bookmarks: {},
     notifications,
+    pages: seedPages(now),
+    locations: seedLocations(),
   }
 }

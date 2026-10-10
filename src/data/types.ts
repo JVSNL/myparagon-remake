@@ -75,3 +75,60 @@ export interface AppNotification {
   createdAt: number
   read: boolean
 }
+
+export type Lang = 'nl' | 'en' | 'de'
+
+/** Content in Dutch, optionally translated. Missing translations fall back to Dutch. */
+export type Localized<T> = { nl: T } & Partial<Record<Exclude<Lang, 'nl'>, T>>
+
+export type RegionId = 'benelux' | 'dach' | 'cee'
+
+export type Tone = ArtworkPalette
+
+/** Building blocks of a content page. */
+export type Block =
+  | { id: string; type: 'hero'; title: string; subtitle?: string; tone: Tone }
+  | { id: string; type: 'heading'; text: string }
+  /** Light markup: blank line = paragraph, "- " = bullet, **bold**, [label](url). */
+  | { id: string; type: 'text'; text: string }
+  | { id: string; type: 'callout'; title: string; text: string; tone: Tone }
+  | { id: string; type: 'quote'; text: string; author?: string }
+  | { id: string; type: 'image'; image: ImageRef; caption?: string }
+  | { id: string; type: 'carousel'; title?: string; slides: { image: ImageRef; title: string }[] }
+  | { id: string; type: 'steps'; title?: string; steps: { title: string; text: string }[] }
+  | { id: string; type: 'links'; title?: string; items: { label: string; url: string }[] }
+  | { id: string; type: 'files'; title?: string; documentIds: string[] }
+  | { id: string; type: 'accordion'; title?: string; items: { question: string; answer: string }[] }
+  | { id: string; type: 'feed'; title?: string; channelId: string; limit: number }
+  | { id: string; type: 'people'; title?: string; userIds: string[] }
+
+export type BlockType = Block['type']
+
+export type PageSection = 'division' | 'company' | 'story' | 'general'
+
+export interface Page {
+  id: string
+  slug: string
+  section: PageSection
+  /** Lucide icon name used in menus, see src/components/pageIcons.ts */
+  icon: string
+  title: Localized<string>
+  blocks: Localized<Block[]>
+  updatedAt: number
+  updatedBy: string
+}
+
+export interface Location {
+  id: string
+  city: string
+  country: CountryCode
+  region: RegionId
+  address: string
+  postcode: string
+  phone: string
+  email: string
+  description: string
+  image: ImageRef
+  /** e.g. "Hoofdkantoor", "Fulfilmentcentrum" */
+  kind: string
+}
