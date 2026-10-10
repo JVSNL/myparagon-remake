@@ -36,12 +36,29 @@ src/
   lib/            i18n (nl/en/de), preferences (theme, language), helpers
 ```
 
+## Features
+
+- **News**: feed, articles with one emoji reaction per person, threaded comments, bookmarks; editors post with their own photo
+- **Content pages** built from blocks, stories per department, locations, FAQ and an in-app PDF viewer
+- **People**: Who is Who with search and filters, profiles (edit your own), interactive org chart, regions
+- **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)
+- **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history; post translations; feedback inbox
+- **Search** across news, pages, colleagues, locations and FAQ
+- Notifications centre with per-type settings, dark mode, NL/EN/DE interface, installable as an app (PWA)
+
+Simulated colleagues like and reply to your comments, answer in chats and the board answers questions,
+so the demo feels alive without a backend.
+
 ## Roadmap
 
-1. **Foundation** — navigation, design system, demo login, welcome slides, news feed, articles,
-   emoji reactions, comments, bookmarks, notifications, settings
-2. Content pages built from blocks, stories, locations, FAQ, PDF viewer
+All six phases are built, one pull request each:
+
+1. Foundation — navigation, design system, demo login, welcome slides, news, reactions, comments, notifications
+2. Content pages, stories, locations, FAQ, PDF viewer
 3. Who is Who, profiles, org chart, regions
 4. Chat and Ask the Board
-5. Desktop editor for pages and posts, multilingual content
+5. Desktop editor, multilingual content, settings and feedback
 6. Global search and polish
+
+Possible next steps: a real backend (the store's actions map one-to-one to API calls), push notifications,
+hosting on Netlify with previews per pull request.

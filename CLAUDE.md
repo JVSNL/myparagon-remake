@@ -34,4 +34,6 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
   (a test checks they stay in sync). UI language follows the browser unless set in Settings.
 - Never use `window.alert/confirm/prompt`; use `ConfirmDialog` (they are blocked in the shared demo viewer).
 - `npm run build:demo` builds the shareable single-file demo (memory router, everything inlined).
+- Search lives in `src/lib/search.ts` (pure, tested). New content types should be added there too.
+- Editor actions (pages/posts) require `canEditContent`; drafts never show outside the editor.
 - Seed content is Dutch. Keep the seed deterministic (`src/lib/random.ts`).

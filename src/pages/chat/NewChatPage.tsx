@@ -7,7 +7,7 @@ import { PageHeader } from '../../components/layout/PageHeader'
 import { useT } from '../../lib/preferences'
 import { fullName } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
-import { matchesQuery } from '../PeoplePage'
+import { matchesQuery } from '../../lib/search'
 
 export function NewChatPage() {
   const t = useT()
