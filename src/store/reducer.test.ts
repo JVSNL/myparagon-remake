@@ -185,6 +185,36 @@ describe('profiles and regions', () => {
   })
 })
 
+describe('chat', () => {
+  it('reuses direct conversations and only lets members post', () => {
+    let state = run(signedIn(), { type: 'startConversation', id: 'c1', memberIds: ['u01'], now: NOW })
+    state = run(state, { type: 'startConversation', id: 'c2', memberIds: ['u01'], now: NOW })
+    expect(state.conversations.filter((c) => c.id === 'c1' || c.id === 'c2')).toHaveLength(1)
+    state = run(state, { type: 'sendMessage', id: 'm1', conversationId: 'c1', text: ' Hoi ', now: NOW })
+    expect(state.messages.at(-1)).toMatchObject({ id: 'm1', text: 'Hoi', authorId: DEMO_ACCOUNTS.employee })
+    const notMine = state.conversations.find((c) => !c.memberIds.includes(DEMO_ACCOUNTS.employee))!
+    expect(run(state, { type: 'sendMessage', id: 'm2', conversationId: notMine.id, text: 'x', now: NOW })).toBe(state)
+  })
+
+  it('creates groups with a name and needs at least one other member', () => {
+    const state = run(signedIn(), { type: 'startConversation', id: 'g', memberIds: ['u01', 'u02'], name: ' Team ', now: NOW })
+    expect(state.conversations.find((c) => c.id === 'g')).toMatchObject({ kind: 'group', name: 'Team' })
+    const alone = signedIn()
+    expect(run(alone, { type: 'startConversation', id: 'x', memberIds: [], now: NOW })).toBe(alone)
+  })
+})
+
+describe('Ask the Board', () => {
+  it('lets the board answer and notifies the person who asked', () => {
+    let state = run(signedIn(), { type: 'askQuestion', id: 'q', text: 'Vraag?', visibility: 'board', now: NOW })
+    // An employee cannot answer
+    expect(run(state, { type: 'answerQuestion', questionId: 'q', text: 'Ja', now: NOW, notificationId: 'n' })).toBe(state)
+    state = run(state, { type: 'boardAnswers', questionId: 'q', authorId: 'u01', text: 'Ja', now: NOW, notificationId: 'n' })
+    expect(state.questions.find((q) => q.id === 'q')?.answer).toMatchObject({ text: 'Ja', authorId: 'u01' })
+    expect(state.notifications.find((n) => n.id === 'n')).toMatchObject({ userId: DEMO_ACCOUNTS.employee, type: 'question_answered' })
+  })
+})
+
 describe('publishing', () => {
   const input = {
     channelId: 'c-company',

@@ -1,7 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
 import { useRegion } from '../../lib/useRegion'
-import { fullName, unreadCount } from '../../store/selectors'
+import { fullName, unreadChats, unreadCount } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 import { Avatar } from '../Avatar'
 import { Logo } from '../Logo'
@@ -12,6 +12,7 @@ export function Sidebar() {
   const { state, me } = useStore()
   const region = useRegion()
   const unread = me ? unreadCount(state, me.id) : 0
+  const chats = me ? unreadChats(state, me.id) : 0
 
   return (
     <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-border bg-surface px-4 py-6 lg:flex">
@@ -33,6 +34,12 @@ export function Sidebar() {
               >
                 <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
                 <span className="flex-1">{to === '/region' ? region.name : t(label)}</span>
+                {to === '/general' && chats > 0 && (
+                  <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
+                    <span aria-hidden="true">{chats}</span>
+                    <span className="sr-only">{t('chat.unread', { n: chats })}</span>
+                  </span>
+                )}
                 {to === '/notifications' && unread > 0 && (
                   <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-on-accent">
                     <span aria-hidden="true">{unread}</span>

@@ -1,5 +1,5 @@
 import type { AppNotification, Comment } from '../data/types'
-import { canDeleteComment, canEditComment, canPublish } from './permissions'
+import { canAnswerQuestions, canDeleteComment, canEditComment, canPublish } from './permissions'
 import type { Action, AppState } from './state'
 
 const toggle = (list: string[], value: string) =>
@@ -163,6 +163,93 @@ export function reducer(state: AppState, action: Action): AppState {
       if (changes.firstName === '' || changes.lastName === '') return state
       if (changes.skills) changes.skills = [...new Set(changes.skills.map((s) => s.trim()).filter(Boolean))]
       return { ...state, users: state.users.map((u) => (u.id === action.userId ? { ...u, ...changes } : u)) }
+    }
+
+    case 'startConversation': {
+      const members = [...new Set([me.id, ...action.memberIds])].filter((id) => state.users.some((u) => u.id === id))
+      if (members.length < 2) return state
+      const kind = members.length === 2 && !action.name ? 'direct' : 'group'
+      if (kind === 'direct') {
+        const existing = state.conversations.find(
+          (c) => c.kind === 'direct' && members.every((m) => c.memberIds.includes(m)),
+        )
+        if (existing) return state
+      }
+      const name = action.name?.trim()
+      return {
+        ...state,
+        conversations: [
+          ...state.conversations,
+          { id: action.id, kind, ...(kind === 'group' ? { name: name || undefined } : {}), memberIds: members, createdAt: action.now },
+        ],
+      }
+    }
+
+    case 'sendMessage': {
+      const text = action.text.trim()
+      const conversation = state.conversations.find((c) => c.id === action.conversationId)
+      if (!text || !conversation?.memberIds.includes(me.id)) return state
+      return {
+        ...state,
+        messages: [...state.messages, { id: action.id, conversationId: conversation.id, authorId: me.id, text, createdAt: action.now }],
+        chatRead: { ...state.chatRead, [me.id]: { ...state.chatRead[me.id], [conversation.id]: action.now } },
+      }
+    }
+
+    case 'markConversationRead': {
+      const conversation = state.conversations.find((c) => c.id === action.conversationId)
+      if (!conversation?.memberIds.includes(me.id)) return state
+      return { ...state, chatRead: { ...state.chatRead, [me.id]: { ...state.chatRead[me.id], [conversation.id]: action.now } } }
+    }
+
+    case 'colleagueMessage': {
+      const conversation = state.conversations.find((c) => c.id === action.conversationId)
+      if (!conversation?.memberIds.includes(action.authorId)) return state
+      return {
+        ...state,
+        messages: [
+          ...state.messages,
+          { id: action.id, conversationId: conversation.id, authorId: action.authorId, text: action.text, createdAt: action.now },
+        ],
+      }
+    }
+
+    case 'askQuestion': {
+      const text = action.text.trim()
+      if (!text) return state
+      return {
+        ...state,
+        questions: [{ id: action.id, authorId: me.id, text, visibility: action.visibility, createdAt: action.now }, ...state.questions],
+      }
+    }
+
+    case 'answerQuestion':
+    case 'boardAnswers': {
+      const authorId = action.type === 'answerQuestion' ? me.id : action.authorId
+      const author = state.users.find((u) => u.id === authorId) ?? null
+      const question = state.questions.find((q) => q.id === action.questionId)
+      const text = action.text.trim()
+      if (!question || question.answer || !text || !canAnswerQuestions(author)) return state
+      return {
+        ...state,
+        questions: state.questions.map((q) =>
+          q.id === question.id ? { ...q, answer: { text, authorId, answeredAt: action.now } } : q,
+        ),
+        notifications: [
+          {
+            id: action.notificationId,
+            userId: question.authorId,
+            type: 'question_answered',
+            actorId: authorId,
+            postId: null,
+            commentId: null,
+            questionId: question.id,
+            createdAt: action.now,
+            read: false,
+          },
+          ...state.notifications,
+        ],
+      }
     }
 
     case 'colleagueLikesComment': {

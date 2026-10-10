@@ -1,4 +1,4 @@
-import { Mail, Network, Pencil, Phone } from 'lucide-react'
+import { Mail, MessageCircle, Network, Pencil, Phone } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { Avatar } from '../components/Avatar'
@@ -89,6 +89,10 @@ export function ProfilePage({ own = false }: { own?: boolean }) {
               <Mail className="size-5" aria-hidden="true" />
               {t('profile.mail')}
             </a>
+            <Link to={`/chat/new?with=${user.id}`} className={action}>
+              <MessageCircle className="size-5" aria-hidden="true" />
+              {t('profile.chat')}
+            </Link>
           </div>
         )}
 

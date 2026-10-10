@@ -38,3 +38,33 @@ export const unreadCount = (state: AppState, userId: string) =>
 
 export const isBookmarked = (state: AppState, userId: string, postId: string) =>
   (state.bookmarks[userId] ?? []).includes(postId)
+
+export const conversationsFor = (state: AppState, userId: string) =>
+  state.conversations
+    .filter((c) => c.memberIds.includes(userId))
+    .map((c) => {
+      const messages = state.messages.filter((m) => m.conversationId === c.id)
+      const last = messages.reduce<(typeof messages)[number] | undefined>((a, m) => (!a || m.createdAt > a.createdAt ? m : a), undefined)
+      const readAt = state.chatRead[userId]?.[c.id] ?? 0
+      const unread = messages.filter((m) => m.authorId !== userId && m.createdAt > readAt).length
+      return { conversation: c, last, unread }
+    })
+    .sort((a, b) => (b.last?.createdAt ?? b.conversation.createdAt) - (a.last?.createdAt ?? a.conversation.createdAt))
+
+export const unreadChats = (state: AppState, userId: string) =>
+  conversationsFor(state, userId).reduce((sum, c) => sum + c.unread, 0)
+
+/** Display name of a conversation: the group name, or the other person in a direct chat. */
+export const conversationTitle = (state: AppState, conversation: AppState['conversations'][number], userId: string) => {
+  if (conversation.kind === 'group') {
+    return (
+      conversation.name ??
+      conversation.memberIds
+        .filter((id) => id !== userId)
+        .map((id) => state.users.find((u) => u.id === id)?.firstName ?? '?')
+        .join(', ')
+    )
+  }
+  const other = state.users.find((u) => u.id === conversation.memberIds.find((id) => id !== userId))
+  return other ? fullName(other) : '?'
+}

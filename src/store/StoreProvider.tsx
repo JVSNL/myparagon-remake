@@ -1,5 +1,6 @@
-import { createContext, useContext, useEffect, useMemo, useReducer, useRef, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
 import { buildSeedState, STATE_VERSION } from '../data/seed'
+import { userId as seedUserId } from '../data/seed/users'
 import type { RegionId, User } from '../data/types'
 import { clearImages } from '../lib/imageStore'
 import { readJson, writeJson } from '../lib/storage'
@@ -8,7 +9,7 @@ import type { Action, AppState, NewPostInput, ProfileChanges } from './state'
 
 const KEY = 'mynexora:state'
 
-const newId = (prefix: string) =>
+export const newId = (prefix: string) =>
   `${prefix}-${typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2)}`
 
 const loadState = (): AppState => {
@@ -16,7 +17,9 @@ const loadState = (): AppState => {
   return saved?.version === STATE_VERSION ? saved : buildSeedState(Date.now())
 }
 
-const CANNED_REPLIES = [
+const randomOf = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)]
+
+const COMMENT_REPLIES = [
   'Helemaal mee eens! 👍',
   'Goed punt, daar had ik nog niet zo naar gekeken.',
   'Dank voor het delen!',
@@ -24,15 +27,38 @@ const CANNED_REPLIES = [
   'Mooi gezegd. Laten we het er bij de koffie eens over hebben.',
 ]
 
+const CHAT_REPLIES = [
+  'Klinkt goed!',
+  'Ik kijk er straks naar 👍',
+  'Top, dank je!',
+  'Prima, laten we dat doen.',
+  'Goed idee. Zal ik een afspraak inplannen?',
+  'Haha, precies 😄',
+]
+
+const BOARD_ANSWERS = [
+  'Dank voor je vraag! We nemen dit mee in het volgende directieoverleg en komen er in de kwartaalupdate op terug.',
+  'Goede vraag. Hier wordt aan gewerkt; je leidinggevende kan je er binnenkort meer over vertellen.',
+]
+
+/** Simulated colleagues, so a demo without a backend still feels alive. */
+interface Simulator {
+  comment: (commentId: string, isReply: boolean) => void
+  chat: (conversationId: string) => void
+  question: (questionId: string) => void
+}
+
 interface StoreValue {
   state: AppState
   me: User | null
   actions: ReturnType<typeof createActions>
+  /** conversationId -> userId of the colleague currently "typing". */
+  typing: Record<string, string>
 }
 
 const StoreContext = createContext<StoreValue | null>(null)
 
-function createActions(dispatch: (a: Action) => void, simulate: (commentId: string, isReply: boolean) => void) {
+function createActions(dispatch: (a: Action) => void, simulate: Simulator, getState: () => AppState) {
   return {
     login: (userId: string) => dispatch({ type: 'login', userId }),
     logout: () => dispatch({ type: 'logout' }),
@@ -42,7 +68,7 @@ function createActions(dispatch: (a: Action) => void, simulate: (commentId: stri
     addComment: (postId: string, text: string, parentId: string | null = null) => {
       const id = newId('cm')
       dispatch({ type: 'addComment', id, postId, parentId, text, now: Date.now() })
-      simulate(id, parentId !== null)
+      simulate.comment(id, parentId !== null)
       return id
     },
     editComment: (commentId: string, text: string) => dispatch({ type: 'editComment', commentId, text, now: Date.now() }),
@@ -58,6 +84,36 @@ function createActions(dispatch: (a: Action) => void, simulate: (commentId: stri
     },
     chooseRegion: (region: RegionId) => dispatch({ type: 'chooseRegion', region }),
     updateProfile: (userId: string, changes: ProfileChanges) => dispatch({ type: 'updateProfile', userId, changes }),
+    /** Opens the existing direct conversation with these people, or starts a new one. Returns its id. */
+    startConversation: (memberIds: string[], name?: string) => {
+      const state = getState()
+      const me = state.currentUserId
+      if (!name && memberIds.length === 1 && me) {
+        const existing = state.conversations.find(
+          (c) => c.kind === 'direct' && c.memberIds.includes(me) && c.memberIds.includes(memberIds[0]),
+        )
+        if (existing) return existing.id
+      }
+      // Direct chats get a stable id, so starting one twice (e.g. a double click) opens the same chat.
+      const direct = !name && memberIds.length === 1 && me
+      const id = direct ? `dm-${[me, memberIds[0]].sort().join('-')}` : newId('cv')
+      dispatch({ type: 'startConversation', id, memberIds, name, now: Date.now() })
+      return id
+    },
+    sendMessage: (conversationId: string, text: string) => {
+      dispatch({ type: 'sendMessage', id: newId('m'), conversationId, text, now: Date.now() })
+      simulate.chat(conversationId)
+    },
+    markConversationRead: (conversationId: string) =>
+      dispatch({ type: 'markConversationRead', conversationId, now: Date.now() }),
+    askQuestion: (text: string, visibility: 'public' | 'board') => {
+      const id = newId('q')
+      dispatch({ type: 'askQuestion', id, text, visibility, now: Date.now() })
+      simulate.question(id)
+      return id
+    },
+    answerQuestion: (questionId: string, text: string) =>
+      dispatch({ type: 'answerQuestion', questionId, text, now: Date.now(), notificationId: newId('n') }),
     resetDemo: () => {
       void clearImages()
       dispatch({ type: 'reset', state: buildSeedState(Date.now()) })
@@ -67,6 +123,7 @@ function createActions(dispatch: (a: Action) => void, simulate: (commentId: stri
 
 export function StoreProvider({ children, initialState }: { children: ReactNode; initialState?: AppState }) {
   const [state, dispatch] = useReducer(reducer, initialState, (s) => s ?? loadState())
+  const [typing, setTyping] = useState<Record<string, string>>({})
   const stateRef = useRef(state)
   const timers = useRef<number[]>([])
 
@@ -78,44 +135,57 @@ export function StoreProvider({ children, initialState }: { children: ReactNode;
   useEffect(() => () => timers.current.forEach(clearTimeout), [])
 
   const actions = useMemo(() => {
-    // Simulated colleagues: someone likes your comment after a few seconds,
-    // and someone replies to new top-level comments, so notifications have
-    // something to show in a demo without a backend.
-    const simulate = (commentId: string, isReply: boolean) => {
-      const others = stateRef.current.users.filter((u) => u.id !== stateRef.current.currentUserId)
-      if (others.length === 0) return
-      const pick = () => others[Math.floor(Math.random() * others.length)].id
-      timers.current.push(
-        window.setTimeout(
-          () =>
-            dispatch({
-              type: 'colleagueLikesComment',
-              actorId: pick(),
-              commentId,
-              notificationId: newId('n'),
-              now: Date.now(),
-            }),
-          4000,
+    const later = (ms: number, fn: () => void) => timers.current.push(window.setTimeout(fn, ms))
+    const others = (ids?: string[]) =>
+      (ids ?? stateRef.current.users.map((u) => u.id)).filter((id) => id !== stateRef.current.currentUserId)
+
+    const simulate: Simulator = {
+      // Someone likes your comment, and someone replies to new top-level comments.
+      comment: (commentId, isReply) => {
+        const pool = others()
+        if (pool.length === 0) return
+        later(4000, () =>
+          dispatch({ type: 'colleagueLikesComment', actorId: randomOf(pool), commentId, notificationId: newId('n'), now: Date.now() }),
+        )
+        if (isReply) return
+        later(9000, () =>
+          dispatch({
+            type: 'colleagueReplies',
+            actorId: randomOf(pool),
+            parentId: commentId,
+            id: newId('cm'),
+            text: randomOf(COMMENT_REPLIES),
+            notificationId: newId('n'),
+            now: Date.now(),
+          }),
+        )
+      },
+      // Another member of the conversation starts typing and answers.
+      chat: (conversationId) => {
+        const conversation = stateRef.current.conversations.find((c) => c.id === conversationId)
+        const pool = others(conversation?.memberIds)
+        if (pool.length === 0) return
+        const author = randomOf(pool)
+        later(1500, () => setTyping((t) => ({ ...t, [conversationId]: author })))
+        later(4500, () => {
+          setTyping(({ [conversationId]: _, ...rest }) => rest)
+          dispatch({ type: 'colleagueMessage', id: newId('m'), conversationId, authorId: author, text: randomOf(CHAT_REPLIES), now: Date.now() })
+        })
+      },
+      // The CEO answers new questions.
+      question: (questionId) =>
+        later(8000, () =>
+          dispatch({
+            type: 'boardAnswers',
+            questionId,
+            authorId: seedUserId(1),
+            text: randomOf(BOARD_ANSWERS),
+            now: Date.now(),
+            notificationId: newId('n'),
+          }),
         ),
-      )
-      if (isReply) return
-      timers.current.push(
-        window.setTimeout(
-          () =>
-            dispatch({
-              type: 'colleagueReplies',
-              actorId: pick(),
-              parentId: commentId,
-              id: newId('cm'),
-              text: CANNED_REPLIES[Math.floor(Math.random() * CANNED_REPLIES.length)],
-              notificationId: newId('n'),
-              now: Date.now(),
-            }),
-          9000,
-        ),
-      )
     }
-    return createActions(dispatch, simulate)
+    return createActions(dispatch, simulate, () => stateRef.current)
   }, [])
 
   const me = state.users.find((u) => u.id === state.currentUserId) ?? null
@@ -128,7 +198,7 @@ export function StoreProvider({ children, initialState }: { children: ReactNode;
     }
   }, [me])
 
-  const value = useMemo(() => ({ state, me, actions }), [state, me, actions])
+  const value = useMemo(() => ({ state, me, actions, typing }), [state, me, actions, typing])
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>
 }
 

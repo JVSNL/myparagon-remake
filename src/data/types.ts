@@ -65,17 +65,45 @@ export interface Comment {
   likes: string[]
 }
 
-export type NotificationType = 'new_post' | 'reply' | 'comment_like' | 'post_reaction'
+export type NotificationType = 'new_post' | 'reply' | 'comment_like' | 'post_reaction' | 'question_answered'
 
 export interface AppNotification {
   id: string
   userId: string
   type: NotificationType
   actorId: string
-  postId: string
+  postId: string | null
   commentId: string | null
+  questionId?: string | null
   createdAt: number
   read: boolean
+}
+
+export interface Conversation {
+  id: string
+  kind: 'direct' | 'group'
+  /** Only for groups. */
+  name?: string
+  memberIds: string[]
+  createdAt: number
+}
+
+export interface ChatMessage {
+  id: string
+  conversationId: string
+  authorId: string
+  text: string
+  createdAt: number
+}
+
+export interface Question {
+  id: string
+  authorId: string
+  text: string
+  /** "board": only the board (and admins) can see it. */
+  visibility: 'public' | 'board'
+  createdAt: number
+  answer?: { text: string; authorId: string; answeredAt: number }
 }
 
 export type Lang = 'nl' | 'en' | 'de'
