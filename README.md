@@ -67,6 +67,22 @@ Posts and comments remember the language they were written in. A reader whose ap
 
 Readers can switch automatic translation off in Settings.
 
+## Caching
+
+- **Static files** (`public/_headers`, applied by Netlify): Vite puts a content hash in every file
+  under `/assets/`, so those are cached for a year (`immutable`); a new release always has new file
+  names. `index.html` and the manifest are revalidated on every visit, so a merge to `main` reaches
+  users on their next page load. App routes such as `/news/p01` are rewritten to `index.html` and get
+  Netlify's default `max-age=0, must-revalidate`. Icons keep their names and are cached for a day.
+- **App data in the browser**: the demo keeps its state in `localStorage` under a version
+  (`STATE_VERSION` in `src/data/seed/index.ts`). Bump it whenever the shape of the state changes;
+  every browser then starts from fresh seed data. Settings → "Reset demo" does the same per user.
+  With a real backend the server becomes the source of truth and the browser keeps only preferences.
+- **Translations**: machine translations are cached in memory for the session (`src/lib/translate.ts`).
+  With a backend, store them with the post or comment so each text is translated once per language.
+- **No service worker** yet, so there is no offline cache to go stale. If offline support is added,
+  use an update prompt ("New version available — refresh") rather than silent updates.
+
 ## Roadmap
 
 All phases are built, one pull request each:

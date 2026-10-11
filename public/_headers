@@ -1,0 +1,18 @@
+# Netlify response headers. See README → Caching.
+
+# Build output with a content hash in the file name: a new version always gets a
+# new name, so these can be cached for a year without ever going stale.
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Entry point and app metadata: always check for a newer version.
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/manifest.webmanifest
+  Cache-Control: public, max-age=0, must-revalidate
+
+# Icons keep their name between versions: cache for a day, then revalidate.
+/icons/*
+  Cache-Control: public, max-age=86400, must-revalidate
+/favicon.svg
+  Cache-Control: public, max-age=86400, must-revalidate
