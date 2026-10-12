@@ -6,7 +6,7 @@ import { seedPages } from './pages'
 import { seedChannels, seedComments, seedPosts } from './posts'
 import { seedUsers } from './users'
 
-export const STATE_VERSION = 8
+export const STATE_VERSION = 9
 
 export const buildSeedState = (now: number): AppState => {
   const users = seedUsers()

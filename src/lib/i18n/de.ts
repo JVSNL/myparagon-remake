@@ -413,6 +413,7 @@ export const de: Record<MessageKey, string> = {
   'role.employee': 'Mitarbeitende',
   'role.editor': 'Redaktion',
   'role.admin': 'Administration',
+  'post.photoCredit': "Foto: {source}",
   'translate.from.nl': "Aus dem Niederländischen übersetzt",
   'translate.from.en': "Aus dem Englischen übersetzt",
   'translate.from.de': "Aus dem Deutschen übersetzt",

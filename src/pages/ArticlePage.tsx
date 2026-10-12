@@ -78,6 +78,9 @@ function Article({ post, highlight }: { post: Post; highlight: string | null }) 
       />
       <article className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
         <PostImage image={post.image} className="aspect-[16/9] w-full rounded-xl" />
+        {post.image.kind === 'photo' && (
+          <p className="mt-1.5 text-right text-xs text-muted">{t('post.photoCredit', { source: 'Unsplash' })}</p>
+        )}
 
         <ChannelTag channelId={post.channelId} className="mt-5" />
         <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{content.title}</h1>

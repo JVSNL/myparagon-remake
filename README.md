@@ -39,7 +39,7 @@ src/
 
 ## Features
 
-- **News**: feed, articles with one emoji reaction per person, threaded comments, bookmarks; editors post with their own photo
+- **News**: feed with stock photos (see `CREDITS.md`), articles with one emoji reaction per person, threaded comments, bookmarks; editors post with their own photo
 - **Content pages** built from blocks, stories per department, locations, FAQ and an in-app PDF viewer
 - **People**: Who is Who with search and filters, profiles (edit your own), interactive org chart, regions
 - **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)

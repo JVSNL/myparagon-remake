@@ -37,8 +37,14 @@ export interface Artwork {
   palette: ArtworkPalette
 }
 
-/** Either a generated illustration or a photo uploaded from the device (stored in IndexedDB). */
-export type ImageRef = ({ kind: 'artwork' } & Artwork) | { kind: 'upload'; id: string; alt: string }
+/**
+ * A generated illustration, a stock photo bundled with the app (see src/data/photos.ts),
+ * or a photo uploaded from the device (stored in IndexedDB).
+ */
+export type ImageRef =
+  | ({ kind: 'artwork' } & Artwork)
+  | { kind: 'photo'; id: string }
+  | { kind: 'upload'; id: string; alt: string }
 
 /** Emoji -> ids of the users who reacted with it. */
 export type Reactions = Record<string, string[]>

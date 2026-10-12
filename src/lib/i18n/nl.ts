@@ -411,6 +411,7 @@ export const nl = {
   'role.employee': 'Medewerker',
   'role.editor': 'Redacteur',
   'role.admin': 'Beheerder',
+  'post.photoCredit': "Foto: {source}",
   'translate.from.nl': "Vertaald uit het Nederlands",
   'translate.from.en': "Vertaald uit het Engels",
   'translate.from.de': "Vertaald uit het Duits",
