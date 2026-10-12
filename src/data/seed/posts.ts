@@ -1,4 +1,4 @@
-import type { ArtworkPalette, Channel, Comment, Post, Reactions } from '../types'
+import type { Channel, Comment, Post, Reactions } from '../types'
 import { mulberry32 } from '../../lib/random'
 import { POST_TRANSLATIONS, COMMENT_TRANSLATIONS } from './translations'
 import { userId } from './users'
@@ -17,7 +17,8 @@ interface PostSeed {
   channel: string
   author: number
   hoursAgo: number
-  palette: ArtworkPalette
+  /** Key in PHOTOS (src/data/photos.ts). */
+  photo: string
   title: string
   intro: string
   body: string[]
@@ -28,7 +29,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-sport',
     author: 15,
     hoursAgo: 3,
-    palette: 'sage',
+    photo: 'amstel-ride',
     title: 'Fietstocht langs de Amstel: 62 kilometer en één lekke band',
     intro: 'Veertien collega’s, één gezamenlijke lunch en een bandenwissel in recordtijd. Een terugblik op onze zondagsrit.',
     body: [
@@ -41,7 +42,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-food',
     author: 60,
     hoursAgo: 20,
-    palette: 'warm',
+    photo: 'bake-off',
     title: 'Het grote Nexora-bakfestijn: dit zijn de winnaars',
     intro: 'Tweeëntwintig taarten, één zeer strenge jury en een citroentaart die iedereen versteld deed staan.',
     body: [
@@ -54,7 +55,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-board',
     author: 1,
     hoursAgo: 30,
-    palette: 'navy',
+    photo: 'cargo-bike',
     title: 'Kwartaalupdate: de nieuwe bakfiets komt eraan',
     intro: 'Een korte terugblik op het afgelopen kwartaal en een kijkje achter de schermen bij ons nieuwste model.',
     body: [
@@ -67,7 +68,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-people',
     author: 53,
     hoursAgo: 52,
-    palette: 'warm',
+    photo: 'office-dog',
     title: 'Maak kennis met Pip, kantoorhond van de maand',
     intro: 'Pip is drie jaar, houdt van tennisballen en heeft inmiddels meer volgers dan ons marketingteam.',
     body: [
@@ -80,7 +81,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-it',
     author: 19,
     hoursAgo: 75,
-    palette: 'sky',
+    photo: 'new-app',
     title: 'Welkom in de nieuwe myNexora-app',
     intro: 'Een frisse, snellere app met nieuws, collega’s en alles wat je nodig hebt op één plek.',
     body: [
@@ -92,7 +93,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-green',
     author: 57,
     hoursAgo: 100,
-    palette: 'sage',
+    photo: 'rooftop-harvest',
     title: 'Moestuin op het dak: de eerste oogst is binnen',
     intro: 'Tomaten, basilicum en een verrassend grote pompoen. Onze daktuin in Amsterdam is een succes.',
     body: [
@@ -105,7 +106,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-sport',
     author: 29,
     hoursAgo: 130,
-    palette: 'sky',
+    photo: 'pub-quiz',
     title: 'Pubquiz: Engineering wint (alweer)',
     intro: 'Veertig vragen, acht teams en één beslissende vraag over de hoogste berg van Denemarken.',
     body: [
@@ -118,7 +119,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-company',
     author: 14,
     hoursAgo: 170,
-    palette: 'navy',
+    photo: 'bike-fair',
     title: 'Nexora op de fietsbeurs in Kopenhagen',
     intro: 'Drie dagen, duizenden bezoekers en een stand waar de testritten niet aan te slepen waren.',
     body: [
@@ -130,7 +131,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-people',
     author: 54,
     hoursAgo: 220,
-    palette: 'warm',
+    photo: 'book-club',
     title: 'Boekenclub zoekt nieuwe leden',
     intro: 'Elke maand een boek, één avond praten en altijd iets lekkers erbij. Lees jij mee?',
     body: [
@@ -143,7 +144,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-it',
     author: 24,
     hoursAgo: 260,
-    palette: 'sky',
+    photo: 'phishing',
     title: 'Let op: phishingmails in omloop',
     intro: 'We zien een toename van nepmails die zich voordoen als pakketbezorgers. Zo herken je ze.',
     body: [
@@ -155,7 +156,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-food',
     author: 56,
     hoursAgo: 320,
-    palette: 'warm',
+    photo: 'paella',
     title: 'Paella-workshop in Barcelona: recept inbegrepen',
     intro: 'Het team in Barcelona leerde van een echte chef hoe je de perfecte paella maakt. Het recept delen we graag.',
     body: [
@@ -167,7 +168,7 @@ const POSTS: PostSeed[] = [
     channel: 'c-company',
     author: 15,
     hoursAgo: 400,
-    palette: 'navy',
+    photo: 'playlist',
     title: 'Stuur je favoriete nummer in voor de werkplaats-playlist',
     intro: 'In de werkplaats in Eindhoven staat de muziek altijd aan. Welk nummer mag er niet ontbreken?',
     body: [
@@ -206,7 +207,7 @@ export const seedPosts = (now: number): Post[] => {
       title: p.title,
       intro: p.intro,
       body: p.body,
-      image: { kind: 'artwork', seed: 7 + i * 13, palette: p.palette },
+      image: { kind: 'photo', id: p.photo },
       createdAt: now - p.hoursAgo * HOUR,
       reactions: seedReactions(rand),
       lang: 'nl',

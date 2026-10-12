@@ -53,3 +53,16 @@ describe('formatRelative', () => {
     expect(formatRelative(new Date(2025, 8, 5).getTime(), now, 'en')).toBe('Sep 5, 2025')
   })
 })
+
+describe('seed photos', () => {
+  it('every seed post uses a bundled photo with alt text in all languages', async () => {
+    const { buildSeedState } = await import('../data/seed')
+    const { PHOTOS } = await import('../data/photos')
+    for (const post of buildSeedState(Date.UTC(2026, 0, 1)).posts) {
+      expect(post.image.kind, post.id).toBe('photo')
+      const photo = post.image.kind === 'photo' ? PHOTOS[post.image.id] : undefined
+      expect(photo, post.id).toBeDefined()
+      expect([photo!.alt.nl, photo!.alt.en, photo!.alt.de].every(Boolean)).toBe(true)
+    }
+  })
+})

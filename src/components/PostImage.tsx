@@ -1,7 +1,10 @@
 import { ImageOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import type { ImageRef } from '../data/types'
+import { PHOTOS } from '../data/photos'
 import { loadImage } from '../lib/imageStore'
+import { pick } from '../lib/localized'
+import { usePreferences } from '../lib/preferences'
 import { Artwork } from './Artwork'
 
 const urls = new Map<string, string>()
@@ -28,11 +31,17 @@ function useStoredImage(id: string | null) {
   return url
 }
 
-/** Renders a post or page image: a generated illustration or an uploaded photo. */
+/** Renders a post or page image: a generated illustration, a bundled stock photo or an uploaded photo. */
 export function PostImage({ image, className = '' }: { image: ImageRef; className?: string }) {
+  const { locale } = usePreferences()
   const url = useStoredImage(image.kind === 'upload' ? image.id : null)
 
   if (image.kind === 'artwork') return <Artwork artwork={image} className={className} />
+  if (image.kind === 'photo') {
+    const photo = PHOTOS[image.id]
+    if (!photo) return <div className={`bg-surface-2 ${className}`} aria-hidden="true" />
+    return <img src={photo.src} alt={pick(photo.alt, locale)} loading="lazy" decoding="async" className={`object-cover ${className}`} />
+  }
   if (url === undefined) return <div className={`animate-pulse bg-surface-2 ${className}`} />
   if (url === null) {
     // The photo lives in another browser (or was cleared): show a calm placeholder.
