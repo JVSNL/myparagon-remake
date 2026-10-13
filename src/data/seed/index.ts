@@ -9,7 +9,7 @@ import { seedPages } from './pages'
 import { seedChannels, seedComments, seedPosts } from './posts'
 import { seedUsers } from './users'
 
-export const STATE_VERSION = 12
+export const STATE_VERSION = 13
 
 /**
  * Who opened which post: everyone who reacted or commented, plus a share of the

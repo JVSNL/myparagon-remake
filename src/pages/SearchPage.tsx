@@ -276,14 +276,24 @@ export function SearchPage() {
                   const label = pick(tool.label, locale)
                   return (
                     <li key={tool.id}>
-                      <a href={tool.url} target="_blank" rel="noopener noreferrer" className={rowClass}>
-                        <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" />
-                        <span className="min-w-0 flex-1 font-medium text-heading">
-                          <Highlight text={label} query={query} />
-                        </span>
-                        <ExternalLink className="size-4 text-muted" aria-hidden="true" />
-                        <span className="sr-only">({t('launchpad.external')})</span>
-                      </a>
+                      {tool.url.startsWith('/') ? (
+                        <Link to={tool.url} className={rowClass}>
+                          <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" />
+                          <span className="min-w-0 flex-1 font-medium text-heading">
+                            <Highlight text={label} query={query} />
+                          </span>
+                          <ChevronRight className="size-4 text-muted" aria-hidden="true" />
+                        </Link>
+                      ) : (
+                        <a href={tool.url} target="_blank" rel="noopener noreferrer" className={rowClass}>
+                          <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" />
+                          <span className="min-w-0 flex-1 font-medium text-heading">
+                            <Highlight text={label} query={query} />
+                          </span>
+                          <ExternalLink className="size-4 text-muted" aria-hidden="true" />
+                          <span className="sr-only">({t('launchpad.external')})</span>
+                        </a>
+                      )}
                     </li>
                   )
                 })}
