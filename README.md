@@ -43,8 +43,8 @@ src/
 - **Content pages** built from blocks, stories per department, locations, FAQ and an in-app PDF viewer
 - **People**: Who is Who with search and filters, profiles (edit your own), interactive org chart, regions
 - **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)
-- **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history, page templates and an embed block; post translations; trash to restore deleted posts and pages; role management and launchpad tiles (admins); feedback inbox
-- **Launchpad** on Home: shortcuts to the other tools employees use
+- **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history, page templates and an embed block; post translations; trash to restore deleted posts and pages; role management (admins); feedback inbox
+- **Launchpad** (built, switched off in `src/lib/features.ts`; on the backlog): shortcut tiles to other tools on Home
 - **Polls, forms and events** as page blocks: anonymous poll results, form entries for editors (with CSV export), event sign-ups with a capacity, and an Agenda page
 - **Audiences and scheduling**: target posts at regions, schedule them; editorial calendar and a statistics dashboard (read rate per post) in Beheer
 - **Search** across news, pages, colleagues, locations and FAQ

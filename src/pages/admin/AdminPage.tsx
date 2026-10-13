@@ -12,6 +12,7 @@ import { canEditContent, isAdmin } from '../../store/permissions'
 import { PAGE_TEMPLATE_IDS, type PageTemplateId } from '../../data/pageTemplates'
 import { CalendarPanel } from './CalendarPanel'
 import { DashboardPanel } from './DashboardPanel'
+import { FEATURES } from '../../lib/features'
 import { LaunchpadPanel } from './LaunchpadPanel'
 import { SubmissionsPanel } from './SubmissionsPanel'
 import { TrashPanel } from './TrashPanel'
@@ -148,7 +149,8 @@ export function AdminPage() {
   const q = query.trim().toLowerCase()
   const date = (ts: number) => new Date(ts).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
   const common: Tab[] = ['pages', 'posts', 'calendar', 'stats', 'submissions', 'trash']
-  const tabs: Tab[] = isAdmin(me) ? [...common, 'users', 'launchpad', 'feedback'] : [...common, 'feedback']
+  const adminTabs: Tab[] = FEATURES.launchpad ? ['users', 'launchpad'] : ['users']
+  const tabs: Tab[] = isAdmin(me) ? [...common, ...adminTabs, 'feedback'] : [...common, 'feedback']
   const label: Record<Tab, string> = {
     pages: t('admin.pages'),
     posts: t('admin.posts'),
@@ -275,7 +277,7 @@ export function AdminPage() {
           {tab === 'submissions' && <SubmissionsPanel />}
           {tab === 'trash' && <TrashPanel />}
           {tab === 'users' && <UsersPanel />}
-          {tab === 'launchpad' && <LaunchpadPanel />}
+          {tab === 'launchpad' && FEATURES.launchpad && <LaunchpadPanel />}
 
           {tab === 'feedback' &&
             (state.feedback.length === 0 ? (

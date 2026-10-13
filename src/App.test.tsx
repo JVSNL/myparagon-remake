@@ -6,6 +6,7 @@ import { buildSeedState } from './data/seed'
 import { DEMO_ACCOUNTS } from './data/seed/users'
 import { createTranslationCache } from './lib/translate'
 import { setTranslationCache } from './lib/useTranslated'
+import { FEATURES } from './lib/features'
 
 const start = (userId: string | null = DEMO_ACCOUNTS.employee, path = '/') => {
   const state = buildSeedState(Date.now())
@@ -55,7 +56,7 @@ describe('translated content', () => {
   })
 })
 
-describe('launchpad', () => {
+describe.skipIf(!FEATURES.launchpad)('launchpad', () => {
   afterEach(() => localStorage.removeItem('mynexora:prefs'))
 
   it('explains that a tool without a link is not connected yet', async () => {

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { buildSeedState } from '../data/seed'
+import { FEATURES } from './features'
 import { search } from './search'
 
 const state = buildSeedState(Date.now())
@@ -28,7 +29,7 @@ describe('global search', () => {
   })
 })
 
-describe('launchpad search', () => {
+describe.skipIf(!FEATURES.launchpad)('launchpad search', () => {
   it('finds tools by their name in any language', () => {
     const state = buildSeedState(Date.UTC(2026, 0, 1))
     expect(search(state, 'declaraties', 'nl').tools.map((t) => t.id)).toEqual(['lp-expenses'])
@@ -46,5 +47,11 @@ describe('seed launchpad', () => {
       if (page) expect(state.pages.some((p) => p.slug === page), tile.url).toBe(true)
       if (tool) expect(tool).toBe(tile.id)
     }
+  })
+})
+
+describe('launchpad switched off', () => {
+  it.skipIf(FEATURES.launchpad)('does not show tools in search', () => {
+    expect(search(buildSeedState(Date.UTC(2026, 0, 1)), 'declaraties', 'nl').tools).toEqual([])
   })
 })
