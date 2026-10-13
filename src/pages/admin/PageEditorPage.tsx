@@ -1,6 +1,6 @@
 import { ArrowDown, ArrowUp, Copy, ExternalLink, History, Monitor, Plus, Trash2 } from 'lucide-react'
 import { useEffect, useId, useMemo, useState } from 'react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { BlockView } from '../../components/blocks/BlockView'
 import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { BLOCK_TYPES, BlockEditor, createBlock } from '../../components/editor/BlockEditor'
@@ -25,6 +25,8 @@ export function PageEditorPage() {
   const [addType, setAddType] = useState<BlockType>('text')
   const [message, setMessage] = useState<string | null>(null)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const navigate = useNavigate()
   const [titleError, setTitleError] = useState(false)
   const addId = useId()
 
@@ -307,6 +309,14 @@ export function PageEditorPage() {
                 })}
               </ul>
             </section>
+            <button
+              type="button"
+              onClick={() => setConfirmDelete(true)}
+              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-danger hover:underline"
+            >
+              <Trash2 className="size-4" aria-hidden="true" />
+              {t('pageEdit.delete')}
+            </button>
           </aside>
         </div>
       </div>
@@ -318,6 +328,17 @@ export function PageEditorPage() {
         confirmLabel={t('editor.discard')}
         onConfirm={() => actions.discardPageDraft(page.id)}
         onClose={() => setConfirmDiscard(false)}
+      />
+      <ConfirmDialog
+        open={confirmDelete}
+        title={t('pageEdit.delete')}
+        message={t('pageEdit.deleteConfirm')}
+        confirmLabel={t('pageEdit.delete')}
+        onConfirm={() => {
+          actions.deletePage(page.id)
+          navigate('/beheer', { replace: true })
+        }}
+        onClose={() => setConfirmDelete(false)}
       />
     </>
   )

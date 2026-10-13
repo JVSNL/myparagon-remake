@@ -21,6 +21,7 @@ export const BLOCK_TYPES: BlockType[] = [
   'accordion',
   'feed',
   'people',
+  'embed',
 ]
 
 const placeholderImage = () => ({ kind: 'artwork' as const, seed: Math.floor(Math.random() * 1000), palette: 'navy' as const })
@@ -54,6 +55,8 @@ export function createBlock(type: BlockType, id: string): Block {
       return { id, type, channelId: 'c-company', limit: 3 }
     case 'people':
       return { id, type, userIds: [] }
+    case 'embed':
+      return { id, type, url: 'https://', height: 360 }
   }
 }
 
@@ -70,7 +73,8 @@ export function BlockEditor({ block, onChange }: { block: Block; onChange: (bloc
     block.type === 'files' ||
     block.type === 'accordion' ||
     block.type === 'feed' ||
-    block.type === 'people') && (
+    block.type === 'people' ||
+    block.type === 'embed') && (
     <TextField label={t('field.title')} value={block.title ?? ''} onChange={(title) => onChange({ ...block, title })} />
   )
 
@@ -283,6 +287,29 @@ export function BlockEditor({ block, onChange }: { block: Block; onChange: (bloc
                 </option>
               ))}
           </select>
+        </div>
+      )
+    case 'embed':
+      return (
+        <div className="space-y-2">
+          {titleField}
+          <TextField label={t('field.url')} hint={t('field.embedHint')} value={block.url} onChange={(url) => onChange({ ...block, url })} />
+          <div>
+            <label htmlFor={`${id}-height`} className="text-xs font-medium text-heading">
+              {t('field.height')}
+            </label>
+            <input
+              id={`${id}-height`}
+              type="number"
+              min={160}
+              max={900}
+              step={20}
+              value={block.height}
+              onChange={(e) => onChange({ ...block, height: Math.min(900, Math.max(160, Number(e.target.value) || 360)) })}
+              className={smallField}
+            />
+          </div>
+          <TextField label={t('field.caption')} value={block.caption ?? ''} onChange={(caption) => onChange({ ...block, caption })} />
         </div>
       )
   }

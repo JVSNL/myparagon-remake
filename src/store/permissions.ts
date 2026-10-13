@@ -13,3 +13,6 @@ export const canEditComment = (user: User | null, comment: Comment) =>
 
 export const canDeleteComment = (user: User | null, comment: Comment) =>
   !!user && !comment.deleted && (comment.authorId === user.id || user.role === 'admin')
+
+/** Admins assign roles and manage the launchpad. */
+export const isAdmin = (user: User | null) => user?.role === 'admin'

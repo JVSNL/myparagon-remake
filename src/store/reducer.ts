@@ -1,5 +1,5 @@
 import type { AppNotification, Comment } from '../data/types'
-import { canAnswerQuestions, canDeleteComment, canEditComment, canEditContent, canPublish } from './permissions'
+import { canAnswerQuestions, canDeleteComment, canEditComment, canEditContent, canPublish, isAdmin } from './permissions'
 import type { Action, AppState } from './state'
 
 const toggle = (list: string[], value: string) =>
@@ -316,12 +316,22 @@ export function reducer(state: AppState, action: Action): AppState {
             section: action.section,
             icon: 'file-text',
             title: { nl: title },
-            blocks: { nl: [{ id: `${action.id}-b1`, type: 'hero', title, tone: 'navy' }] },
+            blocks: { nl: action.blocks ?? [{ id: `${action.id}-b1`, type: 'hero', title, tone: 'navy' }] },
             updatedAt: action.now,
             updatedBy: me.id,
             history: [],
           },
         ],
+      }
+    }
+
+    case 'deletePage': {
+      const page = state.pages.find((p) => p.id === action.pageId)
+      if (!canEditContent(me) || !page) return state
+      return {
+        ...state,
+        pages: state.pages.filter((p) => p.id !== page.id),
+        trash: [{ id: action.trashId, kind: 'page', page, deletedAt: action.now, deletedBy: me.id }, ...state.trash],
       }
     }
 
@@ -353,14 +363,58 @@ export function reducer(state: AppState, action: Action): AppState {
     }
 
     case 'deletePost': {
-      if (!canEditContent(me) || !state.posts.some((p) => p.id === action.postId)) return state
+      const post = state.posts.find((p) => p.id === action.postId)
+      if (!canEditContent(me) || !post) return state
+      // The post and its comments move to the trash; notifications and bookmarks are dropped.
       return {
         ...state,
-        posts: state.posts.filter((p) => p.id !== action.postId),
-        comments: state.comments.filter((c) => c.postId !== action.postId),
-        notifications: state.notifications.filter((n) => n.postId !== action.postId),
-        bookmarks: Object.fromEntries(Object.entries(state.bookmarks).map(([u, ids]) => [u, ids.filter((id) => id !== action.postId)])),
+        posts: state.posts.filter((p) => p.id !== post.id),
+        comments: state.comments.filter((c) => c.postId !== post.id),
+        notifications: state.notifications.filter((n) => n.postId !== post.id),
+        bookmarks: Object.fromEntries(Object.entries(state.bookmarks).map(([u, ids]) => [u, ids.filter((id) => id !== post.id)])),
+        trash: [
+          {
+            id: action.trashId,
+            kind: 'post',
+            post,
+            comments: state.comments.filter((c) => c.postId === post.id),
+            deletedAt: action.now,
+            deletedBy: me.id,
+          },
+          ...state.trash,
+        ],
       }
+    }
+
+    case 'restoreFromTrash': {
+      const item = state.trash.find((t) => t.id === action.trashId)
+      if (!canEditContent(me) || !item) return state
+      const trash = state.trash.filter((t) => t.id !== item.id)
+      if (item.kind === 'post') {
+        if (state.posts.some((p) => p.id === item.post.id)) return state
+        return { ...state, trash, posts: [...state.posts, item.post], comments: [...state.comments, ...item.comments] }
+      }
+      // A page whose slug was taken in the meantime cannot come back as is.
+      if (state.pages.some((p) => p.id === item.page.id || p.slug === item.page.slug)) return state
+      return { ...state, trash, pages: [...state.pages, item.page] }
+    }
+
+    case 'purgeFromTrash':
+      if (!canEditContent(me)) return state
+      return { ...state, trash: state.trash.filter((t) => t.id !== action.trashId) }
+
+    case 'setUserRole': {
+      // Admins only, and never on themselves, so there is always an admin left.
+      if (!isAdmin(me) || action.userId === me.id || !state.users.some((u) => u.id === action.userId)) return state
+      return { ...state, users: state.users.map((u) => (u.id === action.userId ? { ...u, role: action.role } : u)) }
+    }
+
+    case 'saveLaunchpad': {
+      if (!isAdmin(me)) return state
+      const links = action.links
+        .map((l) => ({ ...l, label: { ...l.label, nl: l.label.nl.trim() }, url: l.url.trim() }))
+        .filter((l) => l.label.nl && /^(https?:\/\/|\/)/.test(l.url))
+      return { ...state, launchpad: links }
     }
 
     case 'setNotificationPrefs':

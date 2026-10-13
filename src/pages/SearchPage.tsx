@@ -1,9 +1,10 @@
-import { ChevronRight, CircleHelp, Clock, FileText, MapPin, Search, X } from 'lucide-react'
+import { ChevronRight, CircleHelp, Clock, ExternalLink, FileText, MapPin, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { Avatar } from '../components/Avatar'
 import { CompactPostItem } from '../components/CompactPostItem'
 import { PageHeader } from '../components/layout/PageHeader'
+import { launchpadIcon } from '../components/launchpadIcons'
 import { pageIcon } from '../components/pageIcons'
 import { pick } from '../lib/localized'
 import { usePreferences } from '../lib/preferences'
@@ -263,6 +264,27 @@ export function SearchPage() {
                     </Link>
                   </li>
                 ))}
+              </ul>
+            </Group>
+
+            <Group title={t('launchpad.title')} count={results.tools.length}>
+              <ul className={listClass}>
+                {results.tools.map((tool) => {
+                  const Icon = launchpadIcon(tool.icon)
+                  const label = pick(tool.label, locale)
+                  return (
+                    <li key={tool.id}>
+                      <a href={tool.url} target="_blank" rel="noopener noreferrer" className={rowClass}>
+                        <Icon className="size-5 shrink-0 text-primary" aria-hidden="true" />
+                        <span className="min-w-0 flex-1 font-medium text-heading">
+                          <Highlight text={label} query={query} />
+                        </span>
+                        <ExternalLink className="size-4 text-muted" aria-hidden="true" />
+                        <span className="sr-only">({t('launchpad.external')})</span>
+                      </a>
+                    </li>
+                  )
+                })}
               </ul>
             </Group>
 

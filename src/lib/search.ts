@@ -1,4 +1,4 @@
-import type { Block, Lang, Location, Page, Post, User } from '../data/types'
+import type { Block, Lang, LaunchpadLink, Location, Page, Post, User } from '../data/types'
 import { fullName, postContent } from '../store/selectors'
 import type { AppState } from '../store/state'
 import { pick } from './localized'
@@ -39,6 +39,8 @@ export function blockText(block: Block): string {
       return [block.title, ...block.items.map((i) => i.label)].join(' ')
     case 'accordion':
       return [block.title, ...block.items.map((i) => `${i.question} ${i.answer}`)].join(' ')
+    case 'embed':
+      return `${block.title ?? ''} ${block.caption ?? ''}`
     case 'files':
     case 'feed':
     case 'people':
@@ -58,15 +60,16 @@ export interface SearchResults {
   people: User[]
   locations: Location[]
   faq: FaqHit[]
+  tools: LaunchpadLink[]
   total: number
 }
 
 const LIMIT = 8
 
-/** Searches news, pages, colleagues, locations and FAQ. Every word must match (accent-insensitive). */
+/** Searches news, pages, colleagues, locations, FAQ and launchpad tools. Every word must match (accent-insensitive). */
 export function search(state: AppState, query: string, lang: Lang): SearchResults {
   const words = normalize(query.trim()).split(/\s+/).filter(Boolean)
-  const empty = { posts: [], pages: [], people: [], locations: [], faq: [], total: 0 }
+  const empty = { posts: [], pages: [], people: [], locations: [], faq: [], tools: [], total: 0 }
   if (words.length === 0 || query.trim().length < 2) return empty
   const matches = (text: string) => {
     const haystack = normalize(text)
@@ -92,12 +95,15 @@ export function search(state: AppState, query: string, lang: Lang): SearchResult
       .map((item) => ({ page, question: item.question, answer: item.answer })),
   )
 
+  const tools = state.launchpad.filter((l) => matches(Object.values(l.label).join(' ')))
+
   const results = {
     posts: posts.slice(0, LIMIT),
     pages: pages.slice(0, LIMIT),
     people: people.slice(0, LIMIT),
     locations: locations.slice(0, LIMIT),
     faq: faq.slice(0, LIMIT),
+    tools: tools.slice(0, LIMIT),
   }
-  return { ...results, total: posts.length + pages.length + people.length + locations.length + faq.length }
+  return { ...results, total: posts.length + pages.length + people.length + locations.length + faq.length + tools.length }
 }
