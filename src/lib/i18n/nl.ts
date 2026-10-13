@@ -411,6 +411,7 @@ export const nl = {
   'role.employee': 'Medewerker',
   'role.editor': 'Redacteur',
   'role.admin': 'Beheerder',
+  'app.demo': "Demo",
   'tool.back': "Terug naar Home",
   'tool.demo': "Dit is een demo met fictieve gegevens.",
   'tool.body': "De koppeling met {name} moet nog gebouwd worden. Straks open je hier direct de applicatie die jullie daarvoor gebruiken.",

@@ -1,3 +1,5 @@
+import { useT } from '../lib/preferences'
+
 /** Fictional Nexora mark: a single-stroke "N" with a sky-blue dot. */
 /** `inverse` draws a white tile for use on coloured backgrounds. */
 export function LogoMark({ className = 'size-8', inverse = false }: { className?: string; inverse?: boolean }) {
@@ -17,6 +19,20 @@ export function LogoMark({ className = 'size-8', inverse = false }: { className?
   )
 }
 
+/** Small "Demo" label next to the logo, so nobody mistakes the demo for a real app. */
+export function DemoBadge({ inverse = false }: { inverse?: boolean }) {
+  const t = useT()
+  return (
+    <span
+      className={`rounded px-1.5 py-0.5 text-[10px] leading-none font-bold tracking-wide uppercase ${
+        inverse ? 'bg-white/20 text-white' : 'bg-c-orange-soft text-c-orange-text'
+      }`}
+    >
+      {t('app.demo')}
+    </span>
+  )
+}
+
 export function Logo({ className = '', inverse = false }: { className?: string; inverse?: boolean }) {
   return (
     <span className={`inline-flex items-center gap-2 ${className}`}>
@@ -25,6 +41,7 @@ export function Logo({ className = '', inverse = false }: { className?: string; 
         <span className="font-light">my</span>
         <span className="font-bold">Nexora</span>
       </span>
+      <DemoBadge inverse={inverse} />
     </span>
   )
 }

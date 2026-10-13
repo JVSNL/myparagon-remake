@@ -16,3 +16,7 @@
   Cache-Control: public, max-age=86400, must-revalidate
 /favicon.svg
   Cache-Control: public, max-age=86400, must-revalidate
+
+# Demo with fictional data: keep it out of search engines.
+/*
+  X-Robots-Tag: noindex, nofollow

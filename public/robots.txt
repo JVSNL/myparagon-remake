@@ -1,0 +1,3 @@
+# myNexora is a demo with fictional data; search engines should not index it.
+User-agent: *
+Disallow: /
