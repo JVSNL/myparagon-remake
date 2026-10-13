@@ -13,12 +13,13 @@ import { PAGE_TEMPLATE_IDS, type PageTemplateId } from '../../data/pageTemplates
 import { CalendarPanel } from './CalendarPanel'
 import { DashboardPanel } from './DashboardPanel'
 import { LaunchpadPanel } from './LaunchpadPanel'
+import { SubmissionsPanel } from './SubmissionsPanel'
 import { TrashPanel } from './TrashPanel'
 import { UsersPanel } from './UsersPanel'
 import { channelName, fullName, sortedPosts } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 
-type Tab = 'pages' | 'posts' | 'calendar' | 'stats' | 'trash' | 'users' | 'launchpad' | 'feedback'
+type Tab = 'pages' | 'posts' | 'calendar' | 'stats' | 'submissions' | 'trash' | 'users' | 'launchpad' | 'feedback'
 const SECTIONS: PageSection[] = ['division', 'company', 'story', 'general']
 
 function LangBadges({ available }: { available: string[] }) {
@@ -146,13 +147,14 @@ export function AdminPage() {
 
   const q = query.trim().toLowerCase()
   const date = (ts: number) => new Date(ts).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
-  const common: Tab[] = ['pages', 'posts', 'calendar', 'stats', 'trash']
+  const common: Tab[] = ['pages', 'posts', 'calendar', 'stats', 'submissions', 'trash']
   const tabs: Tab[] = isAdmin(me) ? [...common, 'users', 'launchpad', 'feedback'] : [...common, 'feedback']
   const label: Record<Tab, string> = {
     pages: t('admin.pages'),
     posts: t('admin.posts'),
     calendar: t('admin.calendar'),
     stats: t('admin.stats'),
+    submissions: t('admin.submissions'),
     trash: state.trash.length > 0 ? `${t('admin.trash')} (${state.trash.length})` : t('admin.trash'),
     users: t('admin.users'),
     launchpad: t('launchpad.title'),
@@ -270,6 +272,7 @@ export function AdminPage() {
 
           {tab === 'calendar' && <CalendarPanel />}
           {tab === 'stats' && <DashboardPanel />}
+          {tab === 'submissions' && <SubmissionsPanel />}
           {tab === 'trash' && <TrashPanel />}
           {tab === 'users' && <UsersPanel />}
           {tab === 'launchpad' && <LaunchpadPanel />}

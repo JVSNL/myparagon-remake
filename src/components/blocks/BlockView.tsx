@@ -10,6 +10,7 @@ import { Avatar } from '../Avatar'
 import { CompactPostItem } from '../CompactPostItem'
 import { PostImage } from '../PostImage'
 import { RichText } from '../RichText'
+import { EventBlock, FormBlock, PollBlock } from './InteractiveBlocks'
 
 const TONE_BG: Record<Tone, string> = {
   navy: 'from-[#0e3b57] to-[#134D71]',
@@ -316,5 +317,12 @@ export function BlockView({ block }: { block: Block }) {
         </figure>
       )
     }
+
+    case 'poll':
+      return <PollBlock block={block} />
+    case 'form':
+      return <FormBlock block={block} />
+    case 'event':
+      return <EventBlock block={block} />
   }
 }

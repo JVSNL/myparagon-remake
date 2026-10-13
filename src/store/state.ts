@@ -15,6 +15,7 @@ import type {
   LaunchpadLink,
   Role,
   TrashItem,
+  FormSubmission,
   Location,
   Page,
   Post,
@@ -53,6 +54,11 @@ export interface AppState {
   trash: TrashItem[]
   /** postId -> ids of the users who opened the post (for read statistics). */
   reads: Record<string, string[]>
+  /** poll block id -> userId -> chosen option index */
+  pollVotes: Record<string, Record<string, number>>
+  formSubmissions: FormSubmission[]
+  /** event block id -> ids of the users who signed up */
+  eventRegistrations: Record<string, string[]>
 }
 
 export type ProfileChanges = Partial<
@@ -127,6 +133,9 @@ export type Action =
   | { type: 'deletePost'; postId: string; trashId: string; now: number }
   | { type: 'restoreFromTrash'; trashId: string }
   | { type: 'markPostRead'; postId: string }
+  | { type: 'votePoll'; pollId: string; option: number }
+  | { type: 'submitForm'; id: string; formId: string; values: Record<string, string>; now: number }
+  | { type: 'toggleEventRegistration'; eventId: string }
   /** Audience and, while the post is still scheduled, its publication time. */
   | { type: 'updatePostSettings'; postId: string; audience: RegionId[]; publishAt?: number; now: number }
   | { type: 'purgeFromTrash'; trashId: string }

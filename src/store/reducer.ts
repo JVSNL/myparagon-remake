@@ -1,5 +1,5 @@
 import { REGIONS } from '../data/regions'
-import type { AppNotification, Comment, Post, RegionId } from '../data/types'
+import type { AppNotification, Block, Comment, Post, RegionId } from '../data/types'
 import { inAudience } from './selectors'
 import { canAnswerQuestions, canDeleteComment, canEditComment, canEditContent, canPublish, isAdmin } from './permissions'
 import type { Action, AppState } from './state'
@@ -29,6 +29,17 @@ const newPostNotifications = (state: AppState, post: Post, authorId: string): Ap
       createdAt: post.createdAt,
       read: false,
     }))
+
+/** A published block by id, in any page and language (polls, forms and events are found this way). */
+export const findBlock = (state: AppState, id: string): Block | undefined => {
+  for (const page of state.pages) {
+    for (const blocks of Object.values(page.blocks)) {
+      const block = blocks?.find((b) => b.id === id)
+      if (block) return block
+    }
+  }
+  return undefined
+}
 
 const updateComment = (state: AppState, id: string, fn: (c: Comment) => Comment): AppState => ({
   ...state,
@@ -175,6 +186,40 @@ export function reducer(state: AppState, action: Action): AppState {
         posts: [post, ...state.posts],
         notifications: [...newPostNotifications(state, post, me.id), ...state.notifications],
       }
+    }
+
+    case 'votePoll': {
+      const poll = findBlock(state, action.pollId)
+      if (poll?.type !== 'poll' || !Number.isInteger(action.option) || action.option < 0 || action.option >= poll.options.length) return state
+      return { ...state, pollVotes: { ...state.pollVotes, [poll.id]: { ...state.pollVotes[poll.id], [me.id]: action.option } } }
+    }
+
+    case 'submitForm': {
+      const form = findBlock(state, action.formId)
+      if (form?.type !== 'form') return state
+      // Only known fields, trimmed; required fields must be filled and choices must be valid.
+      const values: Record<string, string> = {}
+      for (const field of form.fields) {
+        const value = (action.values[field.id] ?? '').trim()
+        if (field.required && !value) return state
+        if (field.kind === 'choice' && value && !field.options?.includes(value)) return state
+        if (value) values[field.id] = value
+      }
+      return {
+        ...state,
+        formSubmissions: [{ id: action.id, formId: form.id, userId: me.id, values, createdAt: action.now }, ...state.formSubmissions],
+      }
+    }
+
+    case 'toggleEventRegistration': {
+      const event = findBlock(state, action.eventId)
+      if (event?.type !== 'event') return state
+      const attendees = state.eventRegistrations[event.id] ?? []
+      if (attendees.includes(me.id)) {
+        return { ...state, eventRegistrations: { ...state.eventRegistrations, [event.id]: attendees.filter((id) => id !== me.id) } }
+      }
+      if (event.capacity !== undefined && attendees.length >= event.capacity) return state
+      return { ...state, eventRegistrations: { ...state.eventRegistrations, [event.id]: [...attendees, me.id] } }
     }
 
     case 'markPostRead': {

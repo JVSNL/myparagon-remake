@@ -48,6 +48,8 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
   and the launchpad are admin-only (`isAdmin`), and admins cannot change their own role.
 - Show news through `visiblePosts` / `canSeePost` (audience by region, scheduled posts have a future
   `createdAt`); never list `state.posts` directly in employee-facing screens.
+- Poll votes, form entries and event sign-ups are keyed by block id (`findBlock` in the reducer). Poll results
+  are only shown as anonymous percentages; form entries are visible to editors with the sender's name.
 - Names and avatars of people link to their profile (`PersonLink` / `AvatarLink`).
 - Page headers take the colour of their section (`sectionColor` in `navItems.ts`); content on deep
   brand colours uses the `.on-brand` token scope.

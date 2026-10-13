@@ -258,19 +258,19 @@ export const POST_TRANSLATIONS: Record<string, Translations<PostContent>> = {
   },
   p14: {
     en: {
-      title: 'Save the date: the Nexora summer party',
-      intro: 'Music, a bike course and food from all four countries. Put the date in your calendar now.',
+      title: 'Save the date: the Nexora family day',
+      intro: 'Music, a bike course and food from all four countries, for you and your family. Put the date in your calendar now.',
       body: [
-        'This year we celebrate summer at all sites at once: a party at every location, with a live link between the offices.',
-        'The programme and registration will follow in the app soon.',
+        'This year the family day takes place at all sites at once: a party at every location, with a live link between the offices.',
+        'You will soon be able to sign up via the events calendar in the app.',
       ],
     },
     de: {
-      title: 'Save the Date: das Nexora-Sommerfest',
-      intro: 'Musik, ein Radparcours und Essen aus allen vier Ländern. Trag dir den Termin schon mal ein.',
+      title: 'Save the Date: der Nexora-Familientag',
+      intro: 'Musik, ein Radparcours und Essen aus allen vier Ländern, für dich und deine Familie. Trag dir den Termin schon mal ein.',
       body: [
-        'Dieses Jahr feiern wir den Sommer an allen Standorten gleichzeitig: ein Fest an jedem Standort, mit Live-Schaltung zwischen den Büros.',
-        'Programm und Anmeldung folgen bald in der App.',
+        'Dieses Jahr findet der Familientag an allen Standorten gleichzeitig statt: ein Fest an jedem Standort, mit Live-Schaltung zwischen den Büros.',
+        'Anmelden kannst du dich bald über die Termine in der App.',
       ],
     },
   },
