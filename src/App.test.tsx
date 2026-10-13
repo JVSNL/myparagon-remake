@@ -55,6 +55,19 @@ describe('translated content', () => {
   })
 })
 
+describe('launchpad', () => {
+  afterEach(() => localStorage.removeItem('mynexora:prefs'))
+
+  it('explains that a tool without a link is not connected yet', async () => {
+    localStorage.setItem('mynexora:prefs', JSON.stringify({ language: 'nl' }))
+    const user = userEvent.setup()
+    start()
+    await user.click(await screen.findByRole('link', { name: 'Rooster' }))
+    expect(await screen.findByRole('heading', { name: 'Rooster is nog niet gekoppeld' })).toBeInTheDocument()
+    expect(screen.getByText('Dit is een demo met fictieve gegevens.')).toBeInTheDocument()
+  })
+})
+
 describe('App', () => {
   it('sends visitors to the demo login', async () => {
     start(null)

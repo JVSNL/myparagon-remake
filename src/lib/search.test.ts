@@ -35,3 +35,16 @@ describe('launchpad search', () => {
     expect(search(state, 'expenses', 'nl').tools.map((t) => t.id)).toEqual(['lp-expenses'])
   })
 })
+
+describe('seed launchpad', () => {
+  it('only links to pages and placeholders inside the app', () => {
+    const state = buildSeedState(Date.UTC(2026, 0, 1))
+    for (const tile of state.launchpad) {
+      const page = tile.url.match(/^\/pages\/(.+)$/)?.[1]
+      const tool = tile.url.match(/^\/tools\/(.+)$/)?.[1]
+      expect(page || tool, tile.id).toBeTruthy()
+      if (page) expect(state.pages.some((p) => p.slug === page), tile.url).toBe(true)
+      if (tool) expect(tool).toBe(tile.id)
+    }
+  })
+})
