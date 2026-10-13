@@ -17,7 +17,13 @@ interface PageSeed {
 const withIds = (slug: string, blocks: NewBlock[]): Block[] =>
   blocks.map((b, i) => ({ ...b, id: `${slug}-b${i + 1}` }) as Block)
 
-const PAGES: PageSeed[] = [
+/** A local date `inDays` from now at the given time (for events). */
+const at = (now: number, inDays: number, hour: number, minute = 0) => {
+  const d = new Date(now)
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate() + inDays, hour, minute).getTime()
+}
+
+const pageSeeds = (now: number): PageSeed[] => [
   // Product lines
   {
     slug: 'city',
@@ -58,6 +64,15 @@ const PAGES: PageSeed[] = [
           { title: 'Testen', text: 'Duizenden kilometers op de testbaan en in de stad.' },
           { title: 'Productie', text: 'Assemblage in Málaga, vanaf het voorjaar.' },
         ],
+      },
+      {
+        type: 'event',
+        title: 'Proefrit met de nieuwe bakfiets',
+        startsAt: at(now, 9, 12),
+        endsAt: at(now, 9, 13, 30),
+        location: 'Testbaan Eindhoven',
+        description: 'Rij als een van de eersten op het prototype en vertel het engineeringteam wat je ervan vindt.',
+        capacity: 12,
       },
     ],
   },
@@ -141,6 +156,22 @@ const PAGES: PageSeed[] = [
           { title: 'Accu’s', text: 'Elke oude accu nemen we terug en geven we een tweede leven.' },
           { title: 'Onderdelen', text: 'Alle onderdelen zijn tien jaar lang leverbaar.' },
           { title: 'Energie', text: 'Zonnepanelen op onze locaties in Málaga en Eindhoven.' },
+        ],
+      },
+      {
+        type: 'form',
+        title: 'Ideeënbus: maak Nexora groener',
+        intro: 'Heb je een idee om afval, energie of reizen te besparen? Het duurzaamheidsteam leest alles.',
+        fields: [
+          { id: 'title', label: 'Je idee in één zin', kind: 'text', required: true },
+          { id: 'details', label: 'Toelichting', kind: 'textarea', required: true },
+          {
+            id: 'site',
+            label: 'Voor welke locatie?',
+            kind: 'choice',
+            options: ['Alle locaties', 'Amsterdam', 'Eindhoven', 'Antwerpen', 'Kopenhagen', 'Barcelona', 'Málaga'],
+            required: false,
+          },
         ],
       },
       { type: 'feed', title: 'Laatste nieuws', channelId: 'c-green', limit: 3 },
@@ -293,6 +324,19 @@ const PAGES: PageSeed[] = [
     blocks: [
       { type: 'hero', title: 'People & Culture', subtitle: 'Voor alles rond werken bij Nexora.', tone: 'warm' },
       {
+        type: 'poll',
+        question: 'Welke teamactiviteit wil jij het volgende kwartaal?',
+        options: ['Fietstocht door de duinen', 'Kookworkshop', 'Escaperoom', 'Bowlen'],
+      },
+      {
+        type: 'event',
+        title: 'Nexora-familiedag',
+        startsAt: at(now, 20, 16),
+        endsAt: at(now, 20, 22),
+        location: 'Op alle vestigingen',
+        description: 'Muziek, een fietsparcours voor kinderen en eten uit alle vier de landen, met een live verbinding tussen de kantoren. Neem je gezin gerust mee.',
+      },
+      {
         type: 'accordion',
         title: 'Veelgestelde vragen',
         items: [
@@ -391,7 +435,7 @@ const PAGES: PageSeed[] = [
 ]
 
 export const seedPages = (now: number): Page[] =>
-  PAGES.map((p, i) => ({
+  pageSeeds(now).map((p, i) => ({
     id: `pg-${p.slug}`,
     slug: p.slug,
     section: p.section,

@@ -5,6 +5,7 @@ import type { Block, BlockType } from '../../data/types'
 import { useT } from '../../lib/preferences'
 import { fullName } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
+import { toLocalInput } from '../PostSettingsFields'
 import { ImageField, ListField, smallField, TextField, ToneField } from './fields'
 
 export const BLOCK_TYPES: BlockType[] = [
@@ -21,6 +22,9 @@ export const BLOCK_TYPES: BlockType[] = [
   'accordion',
   'feed',
   'people',
+  'poll',
+  'form',
+  'event',
   'embed',
 ]
 
@@ -57,6 +61,17 @@ export function createBlock(type: BlockType, id: string): Block {
       return { id, type, userIds: [] }
     case 'embed':
       return { id, type, url: 'https://', height: 360 }
+    case 'poll':
+      return { id, type, question: '', options: ['', ''] }
+    case 'form':
+      return { id, type, title: '', fields: [{ id: `${id}-f1`, label: '', kind: 'text', required: true }] }
+    case 'event': {
+      // Default: a week from now at 12:00. Uses the clock, so only call from event handlers.
+      const start = new Date()
+      start.setDate(start.getDate() + 7)
+      start.setHours(12, 0, 0, 0)
+      return { id, type, title: '', startsAt: start.getTime(), endsAt: start.getTime() + 3_600_000, location: '' }
+    }
   }
 }
 
@@ -74,6 +89,7 @@ export function BlockEditor({ block, onChange }: { block: Block; onChange: (bloc
     block.type === 'accordion' ||
     block.type === 'feed' ||
     block.type === 'people' ||
+    block.type === 'form' ||
     block.type === 'embed') && (
     <TextField label={t('field.title')} value={block.title ?? ''} onChange={(title) => onChange({ ...block, title })} />
   )
@@ -310,6 +326,103 @@ export function BlockEditor({ block, onChange }: { block: Block; onChange: (bloc
             />
           </div>
           <TextField label={t('field.caption')} value={block.caption ?? ''} onChange={(caption) => onChange({ ...block, caption })} />
+        </div>
+      )
+    case 'poll':
+      return (
+        <div className="space-y-2">
+          <TextField label={t('field.question')} value={block.question} onChange={(question) => onChange({ ...block, question })} />
+          <ListField
+            items={block.options}
+            onChange={(options) => onChange({ ...block, options })}
+            create={() => ''}
+            render={(option, update) => <TextField label={t('field.option')} value={option} onChange={update} />}
+          />
+        </div>
+      )
+    case 'form':
+      return (
+        <div className="space-y-2">
+          {titleField}
+          <TextField multiline label={t('field.intro')} value={block.intro ?? ''} onChange={(intro) => onChange({ ...block, intro })} />
+          <ListField
+            items={block.fields}
+            onChange={(fields) => onChange({ ...block, fields })}
+            create={() => ({ id: `${block.id}-f${Date.now().toString(36)}`, label: '', kind: 'text' as const, required: false })}
+            render={(f, update) => (
+              <>
+                <TextField label={t('field.label')} value={f.label} onChange={(label) => update({ ...f, label })} />
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="text-xs font-medium text-heading">
+                    {t('field.kind')}
+                    <select value={f.kind} onChange={(e) => update({ ...f, kind: e.target.value as typeof f.kind })} className={smallField}>
+                      <option value="text">{t('field.kind.text')}</option>
+                      <option value="textarea">{t('field.kind.textarea')}</option>
+                      <option value="choice">{t('field.kind.choice')}</option>
+                    </select>
+                  </label>
+                  <label className="mt-5 flex items-center gap-2 text-sm text-text">
+                    <input type="checkbox" checked={f.required} onChange={(e) => update({ ...f, required: e.target.checked })} />
+                    {t('field.required')}
+                  </label>
+                </div>
+                {f.kind === 'choice' && (
+                  <TextField
+                    label={t('field.options')}
+                    hint={t('field.optionsHint')}
+                    value={(f.options ?? []).join(', ')}
+                    onChange={(v) => update({ ...f, options: v.split(',').map((o) => o.trim()).filter(Boolean) })}
+                  />
+                )}
+              </>
+            )}
+          />
+        </div>
+      )
+    case 'event':
+      return (
+        <div className="space-y-2">
+          <TextField label={t('field.title')} value={block.title} onChange={(title) => onChange({ ...block, title })} />
+          <div className="grid grid-cols-2 gap-2">
+            <label className="text-xs font-medium text-heading">
+              {t('field.starts')}
+              <input
+                type="datetime-local"
+                value={toLocalInput(block.startsAt)}
+                onChange={(e) => {
+                  const ts = new Date(e.target.value).getTime()
+                  if (!Number.isNaN(ts)) onChange({ ...block, startsAt: ts, endsAt: block.endsAt && block.endsAt > ts ? block.endsAt : ts + 3_600_000 })
+                }}
+                className={smallField}
+              />
+            </label>
+            <label className="text-xs font-medium text-heading">
+              {t('field.ends')}
+              <input
+                type="datetime-local"
+                value={block.endsAt ? toLocalInput(block.endsAt) : ''}
+                min={toLocalInput(block.startsAt)}
+                onChange={(e) => {
+                  const ts = new Date(e.target.value).getTime()
+                  onChange({ ...block, endsAt: Number.isNaN(ts) ? undefined : ts })
+                }}
+                className={smallField}
+              />
+            </label>
+          </div>
+          <TextField label={t('field.location')} value={block.location} onChange={(location) => onChange({ ...block, location })} />
+          <TextField multiline label={t('field.description')} value={block.description ?? ''} onChange={(description) => onChange({ ...block, description })} />
+          <label className="block text-xs font-medium text-heading">
+            {t('field.capacity')}
+            <input
+              type="number"
+              min={1}
+              value={block.capacity ?? ''}
+              placeholder={t('field.unlimited')}
+              onChange={(e) => onChange({ ...block, capacity: e.target.value ? Math.max(1, Number(e.target.value)) : undefined })}
+              className={smallField}
+            />
+          </label>
         </div>
       )
   }

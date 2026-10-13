@@ -45,6 +45,7 @@ src/
 - **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)
 - **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history, page templates and an embed block; post translations; trash to restore deleted posts and pages; role management and launchpad tiles (admins); feedback inbox
 - **Launchpad** on Home: shortcuts to the other tools employees use
+- **Polls, forms and events** as page blocks: anonymous poll results, form entries for editors (with CSV export), event sign-ups with a capacity, and an Agenda page
 - **Audiences and scheduling**: target posts at regions, schedule them; editorial calendar and a statistics dashboard (read rate per post) in Beheer
 - **Search** across news, pages, colleagues, locations and FAQ
 - **Automatic translation**: posts and comments show in the reader's language, with "Show original" one tap away

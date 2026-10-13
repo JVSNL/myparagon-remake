@@ -479,3 +479,48 @@ describe('read statistics', () => {
     expect(before.readRate).toBeLessThanOrEqual(1)
   })
 })
+
+describe('polls, forms and events', () => {
+  const blockOf = (state: AppState, type: string) => state.pages.flatMap((p) => p.blocks.nl).find((b) => b.type === type)!
+
+  it('records one vote per person, which can change', () => {
+    let state = signedIn()
+    const poll = blockOf(state, 'poll')
+    state = run(state, { type: 'votePoll', pollId: poll.id, option: 1 }, { type: 'votePoll', pollId: poll.id, option: 2 })
+    expect(state.pollVotes[poll.id][DEMO_ACCOUNTS.employee]).toBe(2)
+    expect(run(state, { type: 'votePoll', pollId: poll.id, option: 99 })).toBe(state)
+    expect(run(state, { type: 'votePoll', pollId: 'nope', option: 0 })).toBe(state)
+  })
+
+  it('accepts a form entry only with required fields and valid choices', () => {
+    const state = signedIn()
+    const form = blockOf(state, 'form')
+    const before = state.formSubmissions.length
+    const send = (values: Record<string, string>) => run(state, { type: 'submitForm', id: 'fs-new', formId: form.id, values, now: NOW })
+    expect(send({ title: 'Idee' })).toBe(state)
+    expect(send({ title: 'Idee', details: 'Uitleg', site: 'Mars' })).toBe(state)
+    const ok = send({ title: ' Idee ', details: 'Uitleg', site: 'Málaga', extra: 'genegeerd' })
+    expect(ok.formSubmissions).toHaveLength(before + 1)
+    expect(ok.formSubmissions[0]).toMatchObject({ userId: DEMO_ACCOUNTS.employee, values: { title: 'Idee', details: 'Uitleg', site: 'Málaga' } })
+  })
+
+  it('signs up and off for events and respects the capacity', () => {
+    let state = signedIn()
+    const event = state.pages.flatMap((p) => p.blocks.nl).find((b) => b.type === 'event' && b.capacity !== undefined)!
+    if (event.type !== 'event') throw new Error('expected an event')
+    state = run(state, { type: 'toggleEventRegistration', eventId: event.id })
+    expect(state.eventRegistrations[event.id]).toContain(DEMO_ACCOUNTS.employee)
+    state = run(state, { type: 'toggleEventRegistration', eventId: event.id })
+    expect(state.eventRegistrations[event.id]).not.toContain(DEMO_ACCOUNTS.employee)
+    const full = { ...state, eventRegistrations: { ...state.eventRegistrations, [event.id]: state.users.slice(0, event.capacity).map((u) => u.id).filter((id) => id !== DEMO_ACCOUNTS.employee).concat('x').slice(0, event.capacity) } }
+    expect(run(full, { type: 'toggleEventRegistration', eventId: event.id })).toBe(full)
+  })
+
+  it('seeds votes, sign-ups and form entries', () => {
+    const state = signedIn()
+    expect(Object.keys(state.pollVotes[blockOf(state, 'poll').id]).length).toBeGreaterThan(10)
+    expect(state.formSubmissions.length).toBe(3)
+    const capped = state.pages.flatMap((p) => p.blocks.nl).find((b) => b.type === 'event' && b.capacity !== undefined)!
+    if (capped.type === 'event') expect(state.eventRegistrations[capped.id].length).toBeLessThan(capped.capacity!)
+  })
+})

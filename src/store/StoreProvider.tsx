@@ -138,6 +138,10 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     deletePage: (pageId: string) => dispatch({ type: 'deletePage', pageId, trashId: newId('tr'), now: Date.now() }),
     restoreFromTrash: (trashId: string) => dispatch({ type: 'restoreFromTrash', trashId }),
     markPostRead: (postId: string) => dispatch({ type: 'markPostRead', postId }),
+    votePoll: (pollId: string, option: number) => dispatch({ type: 'votePoll', pollId, option }),
+    submitForm: (formId: string, values: Record<string, string>) =>
+      dispatch({ type: 'submitForm', id: newId('fs'), formId, values, now: Date.now() }),
+    toggleEventRegistration: (eventId: string) => dispatch({ type: 'toggleEventRegistration', eventId }),
     updatePostSettings: (postId: string, audience: RegionId[], publishAt?: number) =>
       dispatch({ type: 'updatePostSettings', postId, audience, publishAt, now: Date.now() }),
     purgeFromTrash: (trashId: string) => dispatch({ type: 'purgeFromTrash', trashId }),

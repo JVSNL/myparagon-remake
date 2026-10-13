@@ -33,7 +33,7 @@ export const SIDEBAR_ITEMS: NavItem[] = [
 const SECTION_PREFIXES: [string[], ColorKey][] = [
   [['/region'], 'royal'],
   [['/general', '/chat', '/ask', '/feedback'], 'sage'],
-  [['/menu', '/people', '/profile', '/org', '/pages', '/stories', '/locations', '/documents', '/bookmarks', '/settings'], 'berry'],
+  [['/menu', '/people', '/profile', '/org', '/pages', '/stories', '/locations', '/documents', '/bookmarks', '/settings', '/agenda'], 'berry'],
 ]
 
 /** Colour of the section (tab) a page belongs to; news, search and admin pages are navy. */

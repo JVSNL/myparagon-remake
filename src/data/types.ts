@@ -155,6 +155,12 @@ export type Block =
   | { id: string; type: 'accordion'; title?: string; items: { question: string; answer: string }[] }
   | { id: string; type: 'feed'; title?: string; channelId: string; limit: number }
   | { id: string; type: 'people'; title?: string; userIds: string[] }
+  /** A one-question poll; results are anonymous percentages. Votes are stored per block id. */
+  | { id: string; type: 'poll'; question: string; options: string[] }
+  /** A form whose submissions editors read in Beheer. */
+  | { id: string; type: 'form'; title?: string; intro?: string; fields: FormField[] }
+  /** An event employees sign up for; `capacity` limits the number of places. */
+  | { id: string; type: 'event'; title: string; startsAt: number; endsAt?: number; location: string; description?: string; capacity?: number }
   /** An external page (video, map, form) in a sandboxed frame; https only. */
   | { id: string; type: 'embed'; title?: string; url: string; height: number; caption?: string }
 
@@ -234,3 +240,22 @@ export interface LaunchpadLink {
 export type TrashItem =
   | { id: string; kind: 'post'; post: Post; comments: Comment[]; deletedAt: number; deletedBy: string }
   | { id: string; kind: 'page'; page: Page; deletedAt: number; deletedBy: string }
+
+export interface FormField {
+  id: string
+  label: string
+  kind: 'text' | 'textarea' | 'choice'
+  /** Choices for kind "choice". */
+  options?: string[]
+  required: boolean
+}
+
+export interface FormSubmission {
+  id: string
+  /** Block id of the form. */
+  formId: string
+  userId: string
+  /** fieldId -> answer */
+  values: Record<string, string>
+  createdAt: number
+}

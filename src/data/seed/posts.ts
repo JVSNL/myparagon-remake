@@ -197,11 +197,11 @@ const POSTS: PostSeed[] = [
     author: 60,
     hoursAgo: -50,
     photo: 'pub-quiz',
-    title: 'Save the date: het Nexora-zomerfeest',
-    intro: 'Muziek, een fietsparcours en eten uit alle vier de landen. Zet de datum alvast in je agenda.',
+    title: 'Save the date: de Nexora-familiedag',
+    intro: 'Muziek, een fietsparcours en eten uit alle vier de landen, voor jou en je gezin. Zet de datum alvast in je agenda.',
     body: [
-      'Dit jaar vieren we de zomer met alle vestigingen tegelijk: op elke locatie een feest, met een live verbinding tussen de kantoren.',
-      'Het programma en de inschrijving volgen binnenkort in de app.',
+      'Dit jaar houden we de familiedag op alle vestigingen tegelijk: op elke locatie een feest, met een live verbinding tussen de kantoren.',
+      'Aanmelden kan straks via de agenda in de app.',
     ],
   },
 ]

@@ -1,4 +1,4 @@
-import { Bell, Bookmark, BookOpen, MapPin, Network, Settings, UserRound, Users } from 'lucide-react'
+import { Bell, Bookmark, CalendarDays, BookOpen, MapPin, Network, Settings, UserRound, Users } from 'lucide-react'
 import { pageIcon } from '../components/pageIcons'
 import { colorAt } from '../lib/colors'
 import { pick } from '../lib/localized'
@@ -66,6 +66,7 @@ export function MenuPage() {
         </ListGroup>
 
         <ListGroup>
+          <ListRow icon={CalendarDays} label={t('agenda.title')} to="/agenda" color="sage" />
           <ListRow icon={Bookmark} label={t('nav.bookmarks')} to="/bookmarks" color="orange" />
           <ListRow
             icon={Bell}

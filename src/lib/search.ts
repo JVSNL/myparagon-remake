@@ -39,6 +39,12 @@ export function blockText(block: Block): string {
       return [block.title, ...block.items.map((i) => i.label)].join(' ')
     case 'accordion':
       return [block.title, ...block.items.map((i) => `${i.question} ${i.answer}`)].join(' ')
+    case 'poll':
+      return [block.question, ...block.options].join(' ')
+    case 'form':
+      return [block.title, block.intro, ...block.fields.map((f) => f.label)].join(' ')
+    case 'event':
+      return `${block.title} ${block.location} ${block.description ?? ''}`
     case 'embed':
       return `${block.title ?? ''} ${block.caption ?? ''}`
     case 'files':
