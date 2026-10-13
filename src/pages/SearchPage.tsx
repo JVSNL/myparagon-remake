@@ -9,6 +9,7 @@ import { pageIcon } from '../components/pageIcons'
 import { pick } from '../lib/localized'
 import { usePreferences } from '../lib/preferences'
 import { search } from '../lib/search'
+import { useNow } from '../lib/useNow'
 import { readJson, writeJson } from '../lib/storage'
 import { fullName } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
@@ -57,6 +58,7 @@ const listClass = 'divide-y divide-border overflow-hidden rounded-xl border bord
 export function SearchPage() {
   const { t, locale } = usePreferences()
   const { state, me } = useStore()
+  const now = useNow()
   const [params, setParams] = useSearchParams()
   const [query, setQuery] = useState(params.get('q') ?? '')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -71,7 +73,7 @@ export function SearchPage() {
     return () => window.clearTimeout(id)
   }, [query, setParams])
 
-  const results = useMemo(() => search(state, query, locale), [state, query, locale])
+  const results = useMemo(() => search(state, query, locale, { user: me, now }), [state, query, locale, me, now])
 
   const remember = () => {
     const q = query.trim()

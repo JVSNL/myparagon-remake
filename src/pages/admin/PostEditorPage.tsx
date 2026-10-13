@@ -5,7 +5,10 @@ import { ConfirmDialog } from '../../components/ConfirmDialog'
 import { ImageField } from '../../components/editor/fields'
 import { fieldClass } from '../../components/ImagePicker'
 import { PageHeader } from '../../components/layout/PageHeader'
-import type { ImageRef, Lang, PostContent } from '../../data/types'
+import { PostSettingsFields } from '../../components/PostSettingsFields'
+import type { ImageRef, Lang, PostContent, RegionId } from '../../data/types'
+import { useNow } from '../../lib/useNow'
+import { PostStats } from './PostStats'
 import { LANGUAGES, useT } from '../../lib/preferences'
 import { canEditContent } from '../../store/permissions'
 import { useStore } from '../../store/StoreProvider'
@@ -28,6 +31,10 @@ export function PostEditorPage() {
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
+  const now = useNow()
+  const [audience, setAudience] = useState<RegionId[]>(post?.audience ?? [])
+  const scheduled = !!post && post.createdAt > now
+  const [publishAt, setPublishAt] = useState<number | null>(() => (post && post.createdAt > Date.now() ? post.createdAt : null))
 
   if (!canEditContent(me)) return <Navigate to="/" replace />
   if (!post) return <Navigate to="/beheer" replace />
@@ -44,6 +51,7 @@ export function PostEditorPage() {
     e.preventDefault()
     if (!form.title.trim()) return setError(true)
     actions.updatePost(post.id, lang, { title: form.title, intro: form.intro, body: form.body.split(/\n\s*\n/) }, lang === source ? image : undefined)
+    actions.updatePostSettings(post.id, audience, scheduled ? (publishAt ?? Date.now()) : undefined)
     setSaved(true)
   }
 
@@ -120,6 +128,17 @@ export function PostEditorPage() {
             <ImageField value={image} onChange={(next) => (setImage(next), setSaved(false))} />
           </div>
         )}
+
+        <PostSettingsFields
+          audience={audience}
+          onAudienceChange={(next) => (setAudience(next), setSaved(false))}
+          publishAt={publishAt}
+          onPublishAtChange={scheduled ? (next) => (setPublishAt(next), setSaved(false)) : undefined}
+          now={now}
+          publishedAt={scheduled ? undefined : post.createdAt}
+        />
+
+        {!scheduled && <PostStats post={post} />}
 
         <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4">
           <button type="button" onClick={() => setConfirmDelete(true)} className="inline-flex items-center gap-1.5 text-sm font-medium text-danger">

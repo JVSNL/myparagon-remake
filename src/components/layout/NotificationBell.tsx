@@ -1,13 +1,15 @@
 import { Bell } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useT } from '../../lib/preferences'
+import { useNow } from '../../lib/useNow'
 import { unreadCount } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 
 export function NotificationBell() {
   const t = useT()
   const { state, me } = useStore()
-  const unread = me ? unreadCount(state, me.id) : 0
+  const now = useNow()
+  const unread = me ? unreadCount(state, me.id, now) : 0
   const label = unread > 0 ? `${t('notifications.open')} — ${t('notifications.unread', { n: unread })}` : t('notifications.open')
 
   return (

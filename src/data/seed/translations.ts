@@ -238,6 +238,42 @@ export const POST_TRANSLATIONS: Record<string, Translations<PostContent>> = {
       ],
     },
   },
+  p13: {
+    en: {
+      title: 'New bike shed at the Málaga office',
+      intro: 'Forty spaces, chargers for e-bikes and finally a roof against the (rare) rain.',
+      body: [
+        'Since Monday our Málaga office has a covered bike shed with forty spaces. Twelve of them have a charger for e-bikes.',
+        'You get in with your staff pass. Please do not leave your bike for longer than a week, so there is room for everyone.',
+      ],
+    },
+    de: {
+      title: 'Neuer Fahrradkeller am Büro in Málaga',
+      intro: 'Vierzig Plätze, Ladepunkte für E-Bikes und endlich ein Dach gegen den (seltenen) Regen.',
+      body: [
+        'Seit Montag hat unser Büro in Málaga einen überdachten Fahrradabstellplatz mit vierzig Plätzen. Zwölf davon haben einen Ladepunkt für E-Bikes.',
+        'Du kommst mit deinem Mitarbeiterausweis hinein. Lass dein Rad bitte nicht länger als eine Woche stehen, damit für alle Platz bleibt.',
+      ],
+    },
+  },
+  p14: {
+    en: {
+      title: 'Save the date: the Nexora summer party',
+      intro: 'Music, a bike course and food from all four countries. Put the date in your calendar now.',
+      body: [
+        'This year we celebrate summer at all sites at once: a party at every location, with a live link between the offices.',
+        'The programme and registration will follow in the app soon.',
+      ],
+    },
+    de: {
+      title: 'Save the Date: das Nexora-Sommerfest',
+      intro: 'Musik, ein Radparcours und Essen aus allen vier Ländern. Trag dir den Termin schon mal ein.',
+      body: [
+        'Dieses Jahr feiern wir den Sommer an allen Standorten gleichzeitig: ein Fest an jedem Standort, mit Live-Schaltung zwischen den Büros.',
+        'Programm und Anmeldung folgen bald in der App.',
+      ],
+    },
+  },
 }
 
 /** English and German versions of the seed comments, keyed by their Dutch text. */

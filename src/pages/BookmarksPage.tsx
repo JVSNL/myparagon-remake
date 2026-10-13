@@ -2,14 +2,18 @@ import { Bookmark } from 'lucide-react'
 import { PageHeader } from '../components/layout/PageHeader'
 import { PostCard } from '../components/PostCard'
 import { useT } from '../lib/preferences'
+import { useNow } from '../lib/useNow'
+import type { Post } from '../data/types'
+import { canSeePost } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 export function BookmarksPage() {
   const t = useT()
   const { state, me } = useStore()
+  const now = useNow()
   const posts = (me ? (state.bookmarks[me.id] ?? []) : [])
     .map((id) => state.posts.find((p) => p.id === id))
-    .filter((p) => p !== undefined)
+    .filter((p): p is Post => p !== undefined && canSeePost(p, me, now))
 
   return (
     <>

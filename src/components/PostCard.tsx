@@ -7,6 +7,7 @@ import { useNow } from '../lib/useNow'
 import { usePostContent } from '../lib/usePostContent'
 import { COLOR_CLASSES } from '../lib/colors'
 import { channelColor, commentCount } from '../store/selectors'
+import { AudienceTag } from './AudienceTag'
 import { ChannelTag } from './ChannelTag'
 import { useStore } from '../store/StoreProvider'
 import { PostImage } from './PostImage'
@@ -27,6 +28,7 @@ export function PostCard({ post }: { post: Post }) {
       <div className="p-4 sm:p-5">
         <p className="text-[13px] text-muted">
           <ChannelTag channelId={post.channelId} className="mr-1.5" />
+          <AudienceTag post={post} className="mr-1.5" />
           <time dateTime={new Date(post.createdAt).toISOString()} title={formatFull(post.createdAt, locale)}>
             {formatRelative(post.createdAt, now, locale)}
           </time>

@@ -1,6 +1,6 @@
 import { Plus, Search } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import { fieldClass } from '../../components/ImagePicker'
 import { PageHeader } from '../../components/layout/PageHeader'
 import { pageIcon } from '../../components/pageIcons'
@@ -10,13 +10,15 @@ import type { PageSection } from '../../data/types'
 import { LANGUAGES, usePreferences } from '../../lib/preferences'
 import { canEditContent, isAdmin } from '../../store/permissions'
 import { PAGE_TEMPLATE_IDS, type PageTemplateId } from '../../data/pageTemplates'
+import { CalendarPanel } from './CalendarPanel'
+import { DashboardPanel } from './DashboardPanel'
 import { LaunchpadPanel } from './LaunchpadPanel'
 import { TrashPanel } from './TrashPanel'
 import { UsersPanel } from './UsersPanel'
 import { channelName, fullName, sortedPosts } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 
-type Tab = 'pages' | 'posts' | 'trash' | 'users' | 'launchpad' | 'feedback'
+type Tab = 'pages' | 'posts' | 'calendar' | 'stats' | 'trash' | 'users' | 'launchpad' | 'feedback'
 const SECTIONS: PageSection[] = ['division', 'company', 'story', 'general']
 
 function LangBadges({ available }: { available: string[] }) {
@@ -135,7 +137,8 @@ export function AdminPage() {
   const { t, locale } = usePreferences()
   const { state, me } = useStore()
   const navigate = useNavigate()
-  const [tab, setTab] = useState<Tab>('pages')
+  const [params] = useSearchParams()
+  const [tab, setTab] = useState<Tab>(() => (params.get('tab') as Tab | null) ?? 'pages')
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
 
@@ -143,10 +146,13 @@ export function AdminPage() {
 
   const q = query.trim().toLowerCase()
   const date = (ts: number) => new Date(ts).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
-  const tabs: Tab[] = isAdmin(me) ? ['pages', 'posts', 'trash', 'users', 'launchpad', 'feedback'] : ['pages', 'posts', 'trash', 'feedback']
+  const common: Tab[] = ['pages', 'posts', 'calendar', 'stats', 'trash']
+  const tabs: Tab[] = isAdmin(me) ? [...common, 'users', 'launchpad', 'feedback'] : [...common, 'feedback']
   const label: Record<Tab, string> = {
     pages: t('admin.pages'),
     posts: t('admin.posts'),
+    calendar: t('admin.calendar'),
+    stats: t('admin.stats'),
     trash: state.trash.length > 0 ? `${t('admin.trash')} (${state.trash.length})` : t('admin.trash'),
     users: t('admin.users'),
     launchpad: t('launchpad.title'),
@@ -262,6 +268,8 @@ export function AdminPage() {
             </ul>
           )}
 
+          {tab === 'calendar' && <CalendarPanel />}
+          {tab === 'stats' && <DashboardPanel />}
           {tab === 'trash' && <TrashPanel />}
           {tab === 'users' && <UsersPanel />}
           {tab === 'launchpad' && <LaunchpadPanel />}

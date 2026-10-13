@@ -2,7 +2,9 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { fieldClass, ImagePicker } from '../components/ImagePicker'
 import { PageHeader } from '../components/layout/PageHeader'
-import type { ImageRef } from '../data/types'
+import { PostSettingsFields } from '../components/PostSettingsFields'
+import type { ImageRef, RegionId } from '../data/types'
+import { useNow } from '../lib/useNow'
 import { usePreferences } from '../lib/preferences'
 import { canPublish } from '../store/permissions'
 import { useStore } from '../store/StoreProvider'
@@ -18,6 +20,9 @@ export function ComposePage() {
   const [image, setImage] = useState<Extract<ImageRef, { kind: 'upload' }> | null>(null)
   const [error, setError] = useState(false)
   const [imageError, setImageError] = useState<'missing' | 'alt' | null>(null)
+  const [audience, setAudience] = useState<RegionId[]>([])
+  const [publishAt, setPublishAt] = useState<number | null>(null)
+  const now = useNow()
 
   if (!canPublish(me)) {
     return (
@@ -41,8 +46,11 @@ export function ComposePage() {
       body: body.split(/\n\s*\n/),
       image,
       lang: locale,
+      audience,
+      ...(publishAt !== null ? { publishAt } : {}),
     })
-    navigate(`/news/${id}`, { replace: true })
+    // A scheduled post is not in the feed yet: go to the editorial calendar instead.
+    navigate(publishAt !== null && publishAt > Date.now() ? '/beheer?tab=calendar' : `/news/${id}`, { replace: true })
   }
 
   return (
@@ -129,12 +137,14 @@ export function ComposePage() {
           altError={imageError === 'alt' ? t('compose.altRequired') : null}
         />
 
+        <PostSettingsFields audience={audience} onAudienceChange={setAudience} publishAt={publishAt} onPublishAtChange={setPublishAt} now={now} />
+
         <div className="flex justify-end pt-2">
           <button
             type="submit"
             className="rounded-lg bg-primary px-5 py-2.5 font-medium text-on-primary hover:bg-primary-hover"
           >
-            {t('compose.publish')}
+            {publishAt !== null ? t('schedule.submit') : t('compose.publish')}
           </button>
         </div>
       </form>

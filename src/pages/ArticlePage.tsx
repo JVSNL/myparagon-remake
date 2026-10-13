@@ -1,4 +1,4 @@
-import { Bookmark, MessageCircle, Pencil, SmilePlus } from 'lucide-react'
+import { Bookmark, CalendarClock, MessageCircle, Pencil, SmilePlus } from 'lucide-react'
 import { canEditContent } from '../store/permissions'
 import { useEffect, useRef, useState } from 'react'
 import type { Post } from '../data/types'
@@ -11,7 +11,9 @@ import { ReactionChips } from '../components/reactions/ReactionChips'
 import { ReactionPicker } from '../components/reactions/ReactionPicker'
 import { usePreferences } from '../lib/preferences'
 import { formatFull } from '../lib/time'
-import { channelName, isBookmarked, userById } from '../store/selectors'
+import { canSeePost, channelName, isBookmarked, userById } from '../store/selectors'
+import { useNow } from '../lib/useNow'
+import { AudienceTag } from '../components/AudienceTag'
 import { usePostContent } from '../lib/usePostContent'
 import { TranslationNote } from '../components/TranslationNote'
 import { AvatarLink, PersonLink } from '../components/PersonLink'
@@ -22,8 +24,11 @@ export function ArticlePage() {
   const [params] = useSearchParams()
   const highlight = params.get('comment')
   const t = usePreferences().t
-  const { state } = useStore()
-  const post = state.posts.find((p) => p.id === postId)
+  const { state, me } = useStore()
+  const now = useNow()
+  const found = state.posts.find((p) => p.id === postId)
+  // Editors may preview scheduled posts; everyone else only sees published posts meant for them.
+  const post = found && (canSeePost(found, me, now) || canEditContent(me)) ? found : undefined
 
   useEffect(() => {
     if (highlight) document.getElementById(`comment-${highlight}`)?.scrollIntoView({ block: 'center' })
@@ -44,6 +49,12 @@ export function ArticlePage() {
 function Article({ post, highlight }: { post: Post; highlight: string | null }) {
   const { t, locale } = usePreferences()
   const { state, me, actions } = useStore()
+  const now = useNow()
+  const scheduled = post.createdAt > now
+
+  useEffect(() => {
+    if (!scheduled) actions.markPostRead(post.id)
+  }, [post.id, scheduled, actions])
   const [pickerOpen, setPickerOpen] = useState(false)
   const formRef = useRef<HTMLDivElement>(null)
   const { content, translation } = usePostContent(post)
@@ -82,7 +93,16 @@ function Article({ post, highlight }: { post: Post; highlight: string | null }) 
           <p className="mt-1.5 text-right text-xs text-muted">{t('post.photoCredit', { source: 'Unsplash' })}</p>
         )}
 
-        <ChannelTag channelId={post.channelId} className="mt-5" />
+        {scheduled && (
+          <p className="mt-4 flex items-center gap-2 rounded-lg bg-c-orange-soft px-3 py-2 text-sm font-medium text-c-orange-text">
+            <CalendarClock className="size-4" aria-hidden="true" />
+            {t('schedule.banner', { date: formatFull(post.createdAt, locale) })}
+          </p>
+        )}
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <ChannelTag channelId={post.channelId} />
+          <AudienceTag post={post} />
+        </div>
         <h1 className="mt-1 text-[28px] leading-tight font-light text-heading sm:text-[34px]">{content.title}</h1>
         {content.intro && <p className="mt-3 text-lg leading-relaxed text-text">{content.intro}</p>}
         <TranslationNote translation={translation} className="mt-3" />

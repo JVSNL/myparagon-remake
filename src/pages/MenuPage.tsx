@@ -7,14 +7,16 @@ import { Avatar } from '../components/Avatar'
 import { PageHeader } from '../components/layout/PageHeader'
 import { ListGroup, ListRow } from '../components/List'
 import { usePreferences } from '../lib/preferences'
+import { useNow } from '../lib/useNow'
 import { fullName, unreadCount } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 export function MenuPage() {
   const { t, locale } = usePreferences()
   const { state, me } = useStore()
+  const now = useNow()
   if (!me) return null
-  const unread = unreadCount(state, me.id)
+  const unread = unreadCount(state, me.id, now)
 
   return (
     <>

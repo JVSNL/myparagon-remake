@@ -1,4 +1,6 @@
-import type { AppNotification, Comment } from '../data/types'
+import { REGIONS } from '../data/regions'
+import type { AppNotification, Comment, Post, RegionId } from '../data/types'
+import { inAudience } from './selectors'
 import { canAnswerQuestions, canDeleteComment, canEditComment, canEditContent, canPublish, isAdmin } from './permissions'
 import type { Action, AppState } from './state'
 
@@ -6,6 +8,27 @@ const toggle = (list: string[], value: string) =>
   list.includes(value) ? list.filter((v) => v !== value) : [...list, value]
 
 const currentUser = (state: AppState) => state.users.find((u) => u.id === state.currentUserId) ?? null
+
+/** Unique, known regions; all regions selected means everyone (no audience). */
+const normalizeAudience = (audience: RegionId[] | undefined): RegionId[] => {
+  const ids = REGIONS.map((r) => r.id).filter((id) => audience?.includes(id))
+  return ids.length === REGIONS.length ? [] : ids
+}
+
+/** "New post" notifications for everyone in the post's audience except the author, at publication time. */
+const newPostNotifications = (state: AppState, post: Post, authorId: string): AppNotification[] =>
+  state.users
+    .filter((u) => u.id !== authorId && inAudience(post, u))
+    .map((u) => ({
+      id: `n-${u.id}-${post.id}`,
+      userId: u.id,
+      type: 'new_post',
+      actorId: authorId,
+      postId: post.id,
+      commentId: null,
+      createdAt: post.createdAt,
+      read: false,
+    }))
 
 const updateComment = (state: AppState, id: string, fn: (c: Comment) => Comment): AppState => ({
   ...state,
@@ -132,7 +155,8 @@ export function reducer(state: AppState, action: Action): AppState {
       if (!canPublish(me) || !input.title.trim() || !state.channels.some((c) => c.id === input.channelId)) {
         return state
       }
-      const post = {
+      const audience = normalizeAudience(input.audience)
+      const post: Post = {
         id: action.id,
         channelId: input.channelId,
         authorId: me.id,
@@ -140,23 +164,42 @@ export function reducer(state: AppState, action: Action): AppState {
         intro: input.intro.trim(),
         body: input.body.map((p) => p.trim()).filter(Boolean),
         image: input.image,
-        createdAt: action.now,
+        // A publication time in the future schedules the post.
+        createdAt: Math.max(action.now, input.publishAt ?? action.now),
         reactions: {},
         lang: input.lang ?? 'nl',
+        ...(audience.length ? { audience } : {}),
       }
-      const notifications: AppNotification[] = state.users
-        .filter((u) => u.id !== me.id)
-        .map((u) => ({
-          id: `n-${u.id}-${post.id}`,
-          userId: u.id,
-          type: 'new_post',
-          actorId: me.id,
-          postId: post.id,
-          commentId: null,
-          createdAt: action.now,
-          read: false,
-        }))
-      return { ...state, posts: [post, ...state.posts], notifications: [...notifications, ...state.notifications] }
+      return {
+        ...state,
+        posts: [post, ...state.posts],
+        notifications: [...newPostNotifications(state, post, me.id), ...state.notifications],
+      }
+    }
+
+    case 'markPostRead': {
+      const readers = state.reads[action.postId] ?? []
+      if (readers.includes(me.id) || !state.posts.some((p) => p.id === action.postId)) return state
+      return { ...state, reads: { ...state.reads, [action.postId]: [...readers, me.id] } }
+    }
+
+    case 'updatePostSettings': {
+      const post = state.posts.find((p) => p.id === action.postId)
+      if (!canEditContent(me) || !post) return state
+      const audience = normalizeAudience(action.audience)
+      // The publication time can only move while the post has not been published yet.
+      const scheduled = post.createdAt > action.now
+      const createdAt = scheduled && action.publishAt !== undefined ? Math.max(action.now, action.publishAt) : post.createdAt
+      const { audience: _old, ...rest } = post
+      const updated: Post = { ...rest, createdAt, ...(audience.length ? { audience } : {}) }
+      // Rebuild the "new post" notifications for the new audience and time, keeping read flags.
+      const wasRead = new Set(state.notifications.filter((n) => n.postId === post.id && n.type === 'new_post' && n.read).map((n) => n.userId))
+      const notifications = newPostNotifications(state, updated, post.authorId).map((n) => ({ ...n, read: wasRead.has(n.userId) }))
+      return {
+        ...state,
+        posts: state.posts.map((p) => (p.id === post.id ? updated : p)),
+        notifications: [...notifications, ...state.notifications.filter((n) => !(n.postId === post.id && n.type === 'new_post'))],
+      }
     }
 
     case 'chooseRegion':

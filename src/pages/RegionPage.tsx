@@ -9,7 +9,8 @@ import type { Tone } from '../data/types'
 import { pick } from '../lib/localized'
 import { usePreferences } from '../lib/preferences'
 import { useRegion } from '../lib/useRegion'
-import { fullName, sortedPosts } from '../store/selectors'
+import { useNow } from '../lib/useNow'
+import { fullName, visiblePosts } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 const TONE_BG: Record<Tone, string> = {
@@ -25,11 +26,12 @@ function SectionTitle({ children }: { children: string }) {
 
 export function RegionPage() {
   const { t, locale } = usePreferences()
-  const { state, actions } = useStore()
+  const { state, me, actions } = useStore()
+  const now = useNow()
   const region = useRegion()
 
   const authorsInRegion = new Set(state.users.filter((u) => regionOfCountry(u.country) === region.id).map((u) => u.id))
-  const news = sortedPosts(state)
+  const news = visiblePosts(state, me, now)
     .filter((p) => authorsInRegion.has(p.authorId))
     .slice(0, 4)
   const team = region.team.map((id) => state.users.find((u) => u.id === id)).filter((u) => u !== undefined)

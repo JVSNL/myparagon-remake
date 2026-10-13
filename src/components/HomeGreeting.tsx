@@ -16,11 +16,11 @@ export function HomeGreeting() {
   const greeting = hour < 12 ? 'home.morning' : hour < 18 ? 'home.afternoon' : 'home.evening'
   const today = new Date(now).toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' })
   const stats = [
-    { to: '/notifications', icon: Bell, label: t('home.notifications', { n: unreadCount(state, me.id) }), className: 'bg-c-orange text-[#1c1305]' },
+    { to: '/notifications', icon: Bell, label: t('home.notifications', { n: unreadCount(state, me.id, now) }), className: 'bg-c-orange text-[#1c1305]' },
     { to: '/chat', icon: MessagesSquare, label: t('home.chats', { n: unreadChats(state, me.id) }), className: 'bg-[#6CA885] text-[#08241c]' },
     { to: '/bookmarks', icon: Bookmark, label: t('home.saved', { n: (state.bookmarks[me.id] ?? []).length }), className: 'bg-[#E2A9B1] text-[#3d1a2e]' },
   ]
-  const counts = [unreadCount(state, me.id), unreadChats(state, me.id), (state.bookmarks[me.id] ?? []).length]
+  const counts = [unreadCount(state, me.id, now), unreadChats(state, me.id), (state.bookmarks[me.id] ?? []).length]
   // Only show shortcuts that have something in them.
   const visible = stats.filter((_, i) => counts[i] > 0)
 

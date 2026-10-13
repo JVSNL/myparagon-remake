@@ -51,6 +51,8 @@ export interface AppState {
   launchpad: LaunchpadLink[]
   /** Deleted posts and pages, newest first. */
   trash: TrashItem[]
+  /** postId -> ids of the users who opened the post (for read statistics). */
+  reads: Record<string, string[]>
 }
 
 export type ProfileChanges = Partial<
@@ -65,6 +67,10 @@ export interface NewPostInput {
   image: ImageRef
   /** Language the post is written in; Dutch when absent. */
   lang?: Lang
+  /** Regions that see the post; empty means everyone. */
+  audience?: RegionId[]
+  /** Publication time; a time in the future schedules the post. */
+  publishAt?: number
 }
 
 /*
@@ -120,6 +126,9 @@ export type Action =
   | { type: 'removePostTranslation'; postId: string; lang: Lang }
   | { type: 'deletePost'; postId: string; trashId: string; now: number }
   | { type: 'restoreFromTrash'; trashId: string }
+  | { type: 'markPostRead'; postId: string }
+  /** Audience and, while the post is still scheduled, its publication time. */
+  | { type: 'updatePostSettings'; postId: string; audience: RegionId[]; publishAt?: number; now: number }
   | { type: 'purgeFromTrash'; trashId: string }
   | { type: 'setUserRole'; userId: string; role: Role }
   | { type: 'saveLaunchpad'; links: LaunchpadLink[] }
