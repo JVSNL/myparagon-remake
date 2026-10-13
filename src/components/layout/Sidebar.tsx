@@ -1,6 +1,7 @@
 import { Link, NavLink } from 'react-router-dom'
 import { COLOR_CLASSES } from '../../lib/colors'
 import { useT } from '../../lib/preferences'
+import { useNow } from '../../lib/useNow'
 import { useRegion } from '../../lib/useRegion'
 import { fullName, unreadChats, unreadCount } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
@@ -11,8 +12,9 @@ import { SIDEBAR_ITEMS } from './navItems'
 export function Sidebar() {
   const t = useT()
   const { state, me } = useStore()
+  const now = useNow()
   const region = useRegion()
-  const unread = me ? unreadCount(state, me.id) : 0
+  const unread = me ? unreadCount(state, me.id, now) : 0
   const chats = me ? unreadChats(state, me.id) : 0
 
   return (

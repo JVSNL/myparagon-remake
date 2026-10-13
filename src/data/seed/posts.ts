@@ -1,4 +1,4 @@
-import type { Channel, Comment, Post, Reactions } from '../types'
+import type { RegionId, Channel, Comment, Post, Reactions } from '../types'
 import { mulberry32 } from '../../lib/random'
 import { POST_TRANSLATIONS, COMMENT_TRANSLATIONS } from './translations'
 import { userId } from './users'
@@ -16,9 +16,12 @@ export const seedChannels = (): Channel[] => [
 interface PostSeed {
   channel: string
   author: number
+  /** Negative for a post that is scheduled in the future. */
   hoursAgo: number
   /** Key in PHOTOS (src/data/photos.ts). */
   photo: string
+  /** Only these regions see the post. */
+  audience?: RegionId[]
   title: string
   intro: string
   body: string[]
@@ -176,6 +179,31 @@ const POSTS: PostSeed[] = [
       'Reageer onder dit bericht met jouw favoriete nummer. Aan het eind van de maand zetten we de lijst online, zodat iedereen hem kan beluisteren.',
     ],
   },
+  {
+    channel: 'c-company',
+    author: 26,
+    hoursAgo: 40,
+    photo: 'bike-fair',
+    audience: ['iberia'],
+    title: 'Nieuwe fietsenstalling bij het kantoor in Málaga',
+    intro: 'Veertig plekken, laadpunten voor e-bikes en eindelijk een dak tegen de (zeldzame) regen.',
+    body: [
+      'Sinds maandag heeft ons kantoor in Málaga een overdekte fietsenstalling met veertig plekken. Twaalf daarvan hebben een laadpunt voor e-bikes.',
+      'Je komt binnen met je personeelspas. Laat je fiets niet langer dan een week staan, zodat er voor iedereen plek blijft.',
+    ],
+  },
+  {
+    channel: 'c-people',
+    author: 60,
+    hoursAgo: -50,
+    photo: 'pub-quiz',
+    title: 'Save the date: het Nexora-zomerfeest',
+    intro: 'Muziek, een fietsparcours en eten uit alle vier de landen. Zet de datum alvast in je agenda.',
+    body: [
+      'Dit jaar vieren we de zomer met alle vestigingen tegelijk: op elke locatie een feest, met een live verbinding tussen de kantoren.',
+      'Het programma en de inschrijving volgen binnenkort in de app.',
+    ],
+  },
 ]
 
 const EMOJIS = ['👍', '🎉', '❤️', '💡', '🙏', '😂', '🚀']
@@ -209,7 +237,9 @@ export const seedPosts = (now: number): Post[] => {
       body: p.body,
       image: { kind: 'photo', id: p.photo },
       createdAt: now - p.hoursAgo * HOUR,
-      reactions: seedReactions(rand),
+      // Scheduled posts have no reactions yet.
+      reactions: p.hoursAgo > 0 ? seedReactions(rand) : {},
+      ...(p.audience ? { audience: p.audience } : {}),
       lang: 'nl',
       ...(POST_TRANSLATIONS[id] ? { translations: POST_TRANSLATIONS[id] } : {}),
     }

@@ -7,7 +7,8 @@ import { Launchpad } from '../components/Launchpad'
 import { PostCard } from '../components/PostCard'
 import { useT } from '../lib/preferences'
 import { canPublish } from '../store/permissions'
-import { sortedPosts } from '../store/selectors'
+import { useNow } from '../lib/useNow'
+import { visiblePosts } from '../store/selectors'
 import { useStore } from '../store/StoreProvider'
 
 const PAGE_SIZE = 8
@@ -16,7 +17,8 @@ export function HomePage() {
   const t = useT()
   const { state, me } = useStore()
   const [visible, setVisible] = useState(PAGE_SIZE)
-  const posts = sortedPosts(state)
+  const now = useNow()
+  const posts = visiblePosts(state, me, now)
 
   return (
     <>

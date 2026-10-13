@@ -49,6 +49,10 @@ export type ImageRef =
 /** Emoji -> ids of the users who reacted with it. */
 export type Reactions = Record<string, string[]>
 
+/**
+ * A news post. `createdAt` is the publication time: a post with a future
+ * `createdAt` is scheduled and only shows in the editor until then.
+ */
 export interface Post {
   id: string
   channelId: string
@@ -60,6 +64,8 @@ export interface Post {
   image: ImageRef
   createdAt: number
   reactions: Reactions
+  /** Regions that see the post; absent or empty means everyone. */
+  audience?: RegionId[]
   /** Language the post was written in; Dutch when absent. */
   lang?: Lang
   /** Translations of title, intro and body, keyed by language. */

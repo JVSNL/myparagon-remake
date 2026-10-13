@@ -46,6 +46,8 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
   versions in `src/data/seed/translations.ts` (a test checks this).
 - Deleting posts or pages moves them to `state.trash`; restore goes through `restoreFromTrash`. Role changes
   and the launchpad are admin-only (`isAdmin`), and admins cannot change their own role.
+- Show news through `visiblePosts` / `canSeePost` (audience by region, scheduled posts have a future
+  `createdAt`); never list `state.posts` directly in employee-facing screens.
 - Names and avatars of people link to their profile (`PersonLink` / `AvatarLink`).
 - Page headers take the colour of their section (`sectionColor` in `navItems.ts`); content on deep
   brand colours uses the `.on-brand` token scope.

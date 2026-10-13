@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { documentById } from '../../data/documents'
 import type { Block, Tone } from '../../data/types'
 import { usePreferences, useT } from '../../lib/preferences'
-import { fullName, sortedPosts } from '../../store/selectors'
+import { fullName, visiblePosts } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 import { Avatar } from '../Avatar'
 import { CompactPostItem } from '../CompactPostItem'
@@ -103,7 +103,7 @@ function Carousel({ block }: { block: Extract<Block, { type: 'carousel' }> }) {
 
 export function BlockView({ block }: { block: Block }) {
   const { t, locale } = usePreferences()
-  const { state } = useStore()
+  const { state, me } = useStore()
 
   switch (block.type) {
     case 'hero':
@@ -248,7 +248,7 @@ export function BlockView({ block }: { block: Block }) {
       )
 
     case 'feed': {
-      const posts = sortedPosts(state)
+      const posts = visiblePosts(state, me, Date.now())
         .filter((p) => p.channelId === block.channelId)
         .slice(0, block.limit)
       if (posts.length === 0) return null

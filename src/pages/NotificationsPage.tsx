@@ -13,8 +13,8 @@ export function NotificationsPage() {
   const { state, me, actions } = useStore()
   const now = useNow()
   if (!me) return null
-  const items = notificationsFor(state, me.id)
-  const unread = unreadCount(state, me.id)
+  const items = notificationsFor(state, me.id, now)
+  const unread = unreadCount(state, me.id, now)
 
   return (
     <>

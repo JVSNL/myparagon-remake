@@ -137,6 +137,9 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     },
     deletePage: (pageId: string) => dispatch({ type: 'deletePage', pageId, trashId: newId('tr'), now: Date.now() }),
     restoreFromTrash: (trashId: string) => dispatch({ type: 'restoreFromTrash', trashId }),
+    markPostRead: (postId: string) => dispatch({ type: 'markPostRead', postId }),
+    updatePostSettings: (postId: string, audience: RegionId[], publishAt?: number) =>
+      dispatch({ type: 'updatePostSettings', postId, audience, publishAt, now: Date.now() }),
     purgeFromTrash: (trashId: string) => dispatch({ type: 'purgeFromTrash', trashId }),
     setUserRole: (userId: string, role: Role) => dispatch({ type: 'setUserRole', userId, role }),
     saveLaunchpad: (links: LaunchpadLink[]) => dispatch({ type: 'saveLaunchpad', links }),

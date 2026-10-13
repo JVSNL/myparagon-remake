@@ -1,5 +1,5 @@
 import type { Block, Lang, LaunchpadLink, Location, Page, Post, User } from '../data/types'
-import { fullName, postContent } from '../store/selectors'
+import { canSeePost, fullName, postContent } from '../store/selectors'
 import type { AppState } from '../store/state'
 import { pick } from './localized'
 
@@ -67,7 +67,8 @@ export interface SearchResults {
 const LIMIT = 8
 
 /** Searches news, pages, colleagues, locations, FAQ and launchpad tools. Every word must match (accent-insensitive). */
-export function search(state: AppState, query: string, lang: Lang): SearchResults {
+/** With a `viewer`, only posts that user may see are searched (audience, scheduling). */
+export function search(state: AppState, query: string, lang: Lang, viewer?: { user: User | null; now: number }): SearchResults {
   const words = normalize(query.trim()).split(/\s+/).filter(Boolean)
   const empty = { posts: [], pages: [], people: [], locations: [], faq: [], tools: [], total: 0 }
   if (words.length === 0 || query.trim().length < 2) return empty
@@ -78,6 +79,7 @@ export function search(state: AppState, query: string, lang: Lang): SearchResult
 
   const posts = [...state.posts]
     .sort((a, b) => b.createdAt - a.createdAt)
+    .filter((p) => !viewer || canSeePost(p, viewer.user, viewer.now))
     .filter((p) => {
       const c = postContent(p, lang)
       return matches([c.title, c.intro, ...c.body].join(' '))

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { buildSeedState } from '../data/seed'
 import { DEMO_ACCOUNTS } from '../data/seed/users'
 import { reducer } from './reducer'
-import { notificationsFor, postContent } from './selectors'
+import { notificationsFor, postContent, postStats, visiblePosts } from './selectors'
 import type { Action, AppState } from './state'
 
 const NOW = Date.UTC(2026, 9, 10, 12)
@@ -311,13 +311,13 @@ describe('comment languages', () => {
 describe('notification settings and feedback', () => {
   it('hides switched-off notification types', () => {
     const me = DEMO_ACCOUNTS.employee
-    const before = notificationsFor(signedIn(), me).length
+    const before = notificationsFor(signedIn(), me, NOW).length
     const state = run(signedIn(), {
       type: 'setNotificationPrefs',
       prefs: { new_post: false, reply: true, comment_like: true, question_answered: true },
     })
     expect(before).toBeGreaterThan(0)
-    expect(notificationsFor(state, me).filter((n) => n.type === 'new_post')).toHaveLength(0)
+    expect(notificationsFor(state, me, NOW).filter((n) => n.type === 'new_post')).toHaveLength(0)
   })
 
   it('stores feedback', () => {
@@ -412,5 +412,70 @@ describe('launchpad', () => {
     expect(saved.launchpad[0].label.nl).toBe('Rooster')
     const editor = signedIn(DEMO_ACCOUNTS.editor)
     expect(run(editor, { type: 'saveLaunchpad', links })).toBe(editor)
+  })
+})
+
+describe('audiences and scheduling', () => {
+  const input = { channelId: 'c-company', title: 'Alleen voor Iberia', intro: '', body: ['Hola'], image: { kind: 'photo' as const, id: 'paella' } }
+  const userIn = (state: AppState, country: string) => state.users.find((u) => u.country === country && u.role === 'employee')!
+
+  it('shows a targeted post and its notification only to that region', () => {
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'createPost', id: 'p-es', input: { ...input, audience: ['iberia'] }, now: NOW })
+    const spanish = userIn(state, 'ES')
+    const dutch = userIn(state, 'NL')
+    expect(visiblePosts(state, spanish, NOW).some((p) => p.id === 'p-es')).toBe(true)
+    expect(visiblePosts(state, dutch, NOW).some((p) => p.id === 'p-es')).toBe(false)
+    expect(notificationsFor(state, spanish.id, NOW).some((n) => n.postId === 'p-es')).toBe(true)
+    expect(notificationsFor(state, dutch.id, NOW).some((n) => n.postId === 'p-es')).toBe(false)
+  })
+
+  it('treats all regions as everyone', () => {
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'createPost', id: 'p-all', input: { ...input, audience: ['benelux', 'nordics', 'iberia'] }, now: NOW })
+    expect(state.posts.find((p) => p.id === 'p-all')?.audience).toBeUndefined()
+  })
+
+  it('keeps a scheduled post and its notifications hidden until it is published', () => {
+    const later = NOW + 86_400_000
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'createPost', id: 'p-later', input: { ...input, publishAt: later }, now: NOW })
+    const employee = state.users.find((u) => u.id === DEMO_ACCOUNTS.employee)!
+    expect(state.posts.find((p) => p.id === 'p-later')?.createdAt).toBe(later)
+    expect(visiblePosts(state, employee, NOW).some((p) => p.id === 'p-later')).toBe(false)
+    expect(notificationsFor(state, employee.id, NOW).some((n) => n.postId === 'p-later')).toBe(false)
+    expect(visiblePosts(state, employee, later).some((p) => p.id === 'p-later')).toBe(true)
+    expect(notificationsFor(state, employee.id, later).some((n) => n.postId === 'p-later')).toBe(true)
+  })
+
+  it('updates the audience and moves the publication time while scheduled', () => {
+    const later = NOW + 86_400_000
+    let state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'createPost', id: 'p-x', input: { ...input, publishAt: later }, now: NOW })
+    state = run(state, { type: 'updatePostSettings', postId: 'p-x', audience: ['nordics'], publishAt: NOW + 3_600_000, now: NOW })
+    const post = state.posts.find((p) => p.id === 'p-x')!
+    expect(post.audience).toEqual(['nordics'])
+    expect(post.createdAt).toBe(NOW + 3_600_000)
+    const notified = state.notifications.filter((n) => n.postId === 'p-x').map((n) => n.userId)
+    expect(notified.every((id) => state.users.find((u) => u.id === id)?.country === 'DK')).toBe(true)
+    // A published post keeps its date.
+    const published = run(state, { type: 'updatePostSettings', postId: 'p01', audience: [], publishAt: NOW + 1, now: NOW })
+    expect(published.posts.find((p) => p.id === 'p01')?.createdAt).toBe(state.posts.find((p) => p.id === 'p01')?.createdAt)
+  })
+
+  it('seeds one scheduled post and one post for Iberia only', () => {
+    const state = signedIn()
+    expect(state.posts.filter((p) => p.createdAt > NOW)).toHaveLength(1)
+    expect(state.posts.filter((p) => p.audience?.includes('iberia'))).toHaveLength(1)
+  })
+})
+
+describe('read statistics', () => {
+  it('counts each reader once, out of the audience', () => {
+    const state = signedIn()
+    const post = state.posts.find((p) => p.id === 'p02')!
+    const before = postStats(state, post)
+    const once = run({ ...state, reads: { ...state.reads, p02: [] } }, { type: 'markPostRead', postId: 'p02' })
+    const twice = run(once, { type: 'markPostRead', postId: 'p02' })
+    expect(twice.reads.p02).toEqual([DEMO_ACCOUNTS.employee])
+    expect(before.audience).toBe(state.users.length)
+    expect(before.readRate).toBeGreaterThan(0)
+    expect(before.readRate).toBeLessThanOrEqual(1)
   })
 })

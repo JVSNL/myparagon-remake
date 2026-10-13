@@ -1,3 +1,5 @@
+import { regionOfCountry } from '../data/regions'
+import { canEditContent } from './permissions'
 import type { AppNotification, Comment, Lang, NotificationPrefs, Post, PostContent, User } from '../data/types'
 import type { AppState } from './state'
 
@@ -10,6 +12,21 @@ export const channelName = (state: AppState, id: string) => state.channels.find(
 export const channelColor = (state: AppState, id: string) => state.channels.find((c) => c.id === id)?.color ?? 'navy'
 
 export const sortedPosts = (state: AppState) => [...state.posts].sort((a, b) => b.createdAt - a.createdAt)
+
+/** Whether the post's audience includes the user's region (no audience = everyone). */
+export const inAudience = (post: Post, user: User) =>
+  !post.audience?.length || post.audience.includes(regionOfCountry(user.country))
+
+/** Published, and meant for this user. Editors and admins also see posts for other regions. */
+export const canSeePost = (post: Post, user: User | null, now: number) =>
+  !!user && post.createdAt <= now && (inAudience(post, user) || canEditContent(user))
+
+/** The news feed of a user: published posts for their region, newest first. */
+export const visiblePosts = (state: AppState, user: User | null, now: number) =>
+  sortedPosts(state).filter((p) => canSeePost(p, user, now))
+
+/** Users in a post's audience, i.e. everyone who can be expected to read it. */
+export const audienceOf = (state: AppState, post: Post) => state.users.filter((u) => inAudience(post, u))
 
 export const reactionTotal = (post: Post) => Object.values(post.reactions).reduce((sum, list) => sum + list.length, 0)
 
@@ -53,14 +70,16 @@ const PREF_OF: Record<AppNotification['type'], keyof NotificationPrefs> = {
 }
 
 /** The user's notifications, newest first, without the types they switched off. */
-export const notificationsFor = (state: AppState, userId: string) => {
+/** Notifications of a user up to `now`; notifications of scheduled posts wait until they are published. */
+export const notificationsFor = (state: AppState, userId: string, now: number) => {
   const prefs = notificationPrefsFor(state, userId)
   return state.notifications
-    .filter((n) => n.userId === userId && prefs[PREF_OF[n.type]])
+    .filter((n) => n.userId === userId && n.createdAt <= now && prefs[PREF_OF[n.type]])
     .sort((a, b) => b.createdAt - a.createdAt)
 }
 
-export const unreadCount = (state: AppState, userId: string) => notificationsFor(state, userId).filter((n) => !n.read).length
+export const unreadCount = (state: AppState, userId: string, now: number) =>
+  notificationsFor(state, userId, now).filter((n) => !n.read).length
 
 /** Title, intro and body in the requested language, falling back to the original. */
 export const postContent = (post: Post, lang: Lang): PostContent =>
@@ -97,4 +116,26 @@ export const conversationTitle = (state: AppState, conversation: AppState['conve
   }
   const other = state.users.find((u) => u.id === conversation.memberIds.find((id) => id !== userId))
   return other ? fullName(other) : '?'
+}
+
+export interface PostStats {
+  readers: number
+  audience: number
+  /** 0..1 */
+  readRate: number
+  reactions: number
+  comments: number
+}
+
+/** Reads, reactions and comments of a post, for the statistics in Beheer. */
+export const postStats = (state: AppState, post: Post): PostStats => {
+  const audience = audienceOf(state, post).length
+  const readers = (state.reads[post.id] ?? []).length
+  return {
+    readers,
+    audience,
+    readRate: audience > 0 ? Math.min(1, readers / audience) : 0,
+    reactions: reactionTotal(post),
+    comments: commentCount(state, post.id),
+  }
 }
