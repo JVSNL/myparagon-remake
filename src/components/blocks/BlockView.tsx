@@ -292,5 +292,29 @@ export function BlockView({ block }: { block: Block }) {
           </ul>
         </section>
       )
+
+    case 'embed': {
+      const safe = /^https:\/\//.test(block.url) && block.url.length > 'https://'.length
+      return (
+        <figure>
+          <BlockTitle>{block.title}</BlockTitle>
+          {safe ? (
+            <iframe
+              src={block.url}
+              title={block.title || block.caption || t('blocks.embedTitle')}
+              height={block.height}
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+              allow="fullscreen; picture-in-picture"
+              className="w-full rounded-xl border border-border bg-surface"
+            />
+          ) : (
+            <p className="rounded-xl border border-dashed border-border bg-surface p-6 text-center text-sm text-muted">{t('blocks.embedInvalid')}</p>
+          )}
+          {block.caption && <figcaption className="mt-1.5 text-sm text-muted">{block.caption}</figcaption>}
+        </figure>
+      )
+    }
   }
 }

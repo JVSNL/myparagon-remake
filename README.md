@@ -43,7 +43,8 @@ src/
 - **Content pages** built from blocks, stories per department, locations, FAQ and an in-app PDF viewer
 - **People**: Who is Who with search and filters, profiles (edit your own), interactive org chart, regions
 - **Chat** (1-on-1 and groups) and **Ask the Board** (public or board-only questions)
-- **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history; post translations; feedback inbox
+- **Management** (`/beheer`): desktop block editor with live preview, NL/EN/DE versions, drafts and version history, page templates and an embed block; post translations; trash to restore deleted posts and pages; role management and launchpad tiles (admins); feedback inbox
+- **Launchpad** on Home: shortcuts to the other tools employees use
 - **Search** across news, pages, colleagues, locations and FAQ
 - **Automatic translation**: posts and comments show in the reader's language, with "Show original" one tap away
 - Clickable names and avatars everywhere lead to profiles; colourful headers per section

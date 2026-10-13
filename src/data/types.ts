@@ -149,6 +149,8 @@ export type Block =
   | { id: string; type: 'accordion'; title?: string; items: { question: string; answer: string }[] }
   | { id: string; type: 'feed'; title?: string; channelId: string; limit: number }
   | { id: string; type: 'people'; title?: string; userIds: string[] }
+  /** An external page (video, map, form) in a sandboxed frame; https only. */
+  | { id: string; type: 'embed'; title?: string; url: string; height: number; caption?: string }
 
 export type BlockType = Block['type']
 
@@ -211,3 +213,18 @@ export interface Location {
   /** e.g. "Hoofdkantoor", "Flagshipstore" */
   kind: string
 }
+
+/** A tile on the launchpad: a shortcut to another tool employees use. */
+export interface LaunchpadLink {
+  id: string
+  label: Localized<string>
+  url: string
+  /** Lucide icon name, see src/components/launchpadIcons.ts */
+  icon: string
+  color: ColorKey
+}
+
+/** A deleted post or page; editors can restore it from the trash. */
+export type TrashItem =
+  | { id: string; kind: 'post'; post: Post; comments: Comment[]; deletedAt: number; deletedBy: string }
+  | { id: string; kind: 'page'; page: Page; deletedAt: number; deletedBy: string }

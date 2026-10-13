@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react'
 import { buildSeedState, STATE_VERSION } from '../data/seed'
 import { userId as seedUserId } from '../data/seed/users'
-import type { Feedback, ImageRef, Lang, NotificationPrefs, PageContent, PageSection, PostContent, RegionId, User } from '../data/types'
+import type { Feedback, ImageRef, Lang, LaunchpadLink, NotificationPrefs, PageContent, PageSection, PostContent, RegionId, Role, User } from '../data/types'
+import { PAGE_TEMPLATES, type PageTemplateId } from '../data/pageTemplates'
 import { clearImages } from '../lib/imageStore'
 import { readJson, writeJson } from '../lib/storage'
 import { reducer } from './reducer'
@@ -128,15 +129,21 @@ function createActions(dispatch: (a: Action) => void, simulate: Simulator, getSt
     discardPageDraft: (pageId: string) => dispatch({ type: 'discardPageDraft', pageId }),
     publishPage: (pageId: string) => dispatch({ type: 'publishPage', pageId, versionId: newId('v'), now: Date.now() }),
     restorePageVersion: (pageId: string, versionId: string) => dispatch({ type: 'restorePageVersion', pageId, versionId }),
-    createPage: (slug: string, section: PageSection, title: string) => {
+    createPage: (slug: string, section: PageSection, title: string, template: PageTemplateId = 'blank') => {
       const id = newId('pg')
-      dispatch({ type: 'createPage', id, slug, section, title, now: Date.now() })
+      const blocks = PAGE_TEMPLATES[template](title.trim(), id)
+      dispatch({ type: 'createPage', id, slug, section, title, now: Date.now(), blocks })
       return id
     },
+    deletePage: (pageId: string) => dispatch({ type: 'deletePage', pageId, trashId: newId('tr'), now: Date.now() }),
+    restoreFromTrash: (trashId: string) => dispatch({ type: 'restoreFromTrash', trashId }),
+    purgeFromTrash: (trashId: string) => dispatch({ type: 'purgeFromTrash', trashId }),
+    setUserRole: (userId: string, role: Role) => dispatch({ type: 'setUserRole', userId, role }),
+    saveLaunchpad: (links: LaunchpadLink[]) => dispatch({ type: 'saveLaunchpad', links }),
     updatePost: (postId: string, lang: Lang, content: PostContent, image?: ImageRef) =>
       dispatch({ type: 'updatePost', postId, lang, content, image }),
     removePostTranslation: (postId: string, lang: Lang) => dispatch({ type: 'removePostTranslation', postId, lang }),
-    deletePost: (postId: string) => dispatch({ type: 'deletePost', postId }),
+    deletePost: (postId: string) => dispatch({ type: 'deletePost', postId, trashId: newId('tr'), now: Date.now() }),
     setNotificationPrefs: (prefs: NotificationPrefs) => dispatch({ type: 'setNotificationPrefs', prefs }),
     sendFeedback: (topic: Feedback['topic'], text: string) =>
       dispatch({ type: 'sendFeedback', id: newId('fb'), topic, text, now: Date.now() }),

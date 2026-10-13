@@ -8,11 +8,15 @@ import { PostImage } from '../../components/PostImage'
 import { Sheet } from '../../components/Sheet'
 import type { PageSection } from '../../data/types'
 import { LANGUAGES, usePreferences } from '../../lib/preferences'
-import { canEditContent } from '../../store/permissions'
+import { canEditContent, isAdmin } from '../../store/permissions'
+import { PAGE_TEMPLATE_IDS, type PageTemplateId } from '../../data/pageTemplates'
+import { LaunchpadPanel } from './LaunchpadPanel'
+import { TrashPanel } from './TrashPanel'
+import { UsersPanel } from './UsersPanel'
 import { channelName, fullName, sortedPosts } from '../../store/selectors'
 import { useStore } from '../../store/StoreProvider'
 
-type Tab = 'pages' | 'posts' | 'feedback'
+type Tab = 'pages' | 'posts' | 'trash' | 'users' | 'launchpad' | 'feedback'
 const SECTIONS: PageSection[] = ['division', 'company', 'story', 'general']
 
 function LangBadges({ available }: { available: string[] }) {
@@ -38,6 +42,7 @@ function NewPageForm({ onDone }: { onDone: (id: string) => void }) {
   const [title, setTitle] = useState('')
   const [slug, setSlug] = useState('')
   const [section, setSection] = useState<PageSection>('story')
+  const [template, setTemplate] = useState<PageTemplateId>('blank')
   const [error, setError] = useState(false)
   const toSlug = (s: string) =>
     s
@@ -51,7 +56,7 @@ function NewPageForm({ onDone }: { onDone: (id: string) => void }) {
     e.preventDefault()
     const valid = title.trim() && /^[a-z0-9-]+$/.test(slug) && !state.pages.some((p) => p.slug === slug)
     if (!valid) return setError(true)
-    onDone(actions.createPage(slug, section, title))
+    onDone(actions.createPage(slug, section, title, template))
   }
 
   return (
@@ -102,6 +107,23 @@ function NewPageForm({ onDone }: { onDone: (id: string) => void }) {
           ))}
         </select>
       </div>
+      <fieldset>
+        <legend className="text-sm font-medium text-heading">{t('newPage.template')}</legend>
+        <div className="mt-1.5 grid gap-2 sm:grid-cols-2">
+          {PAGE_TEMPLATE_IDS.map((id) => (
+            <label
+              key={id}
+              className={`cursor-pointer rounded-lg border p-3 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-focus ${
+                template === id ? 'border-primary bg-primary-soft' : 'border-border hover:bg-surface-2'
+              }`}
+            >
+              <input type="radio" name="np-template" value={id} checked={template === id} onChange={() => setTemplate(id)} className="sr-only" />
+              <span className="block text-sm font-medium text-heading">{t(`template.${id}`)}</span>
+              <span className="block text-xs text-muted">{t(`template.${id}.desc`)}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
       <button type="submit" className="w-full rounded-lg bg-primary py-2.5 font-medium text-on-primary hover:bg-primary-hover">
         {t('newPage.create')}
       </button>
@@ -121,8 +143,15 @@ export function AdminPage() {
 
   const q = query.trim().toLowerCase()
   const date = (ts: number) => new Date(ts).toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
-  const tabs: Tab[] = ['pages', 'posts', 'feedback']
-  const label: Record<Tab, string> = { pages: t('admin.pages'), posts: t('admin.posts'), feedback: t('admin.feedback') }
+  const tabs: Tab[] = isAdmin(me) ? ['pages', 'posts', 'trash', 'users', 'launchpad', 'feedback'] : ['pages', 'posts', 'trash', 'feedback']
+  const label: Record<Tab, string> = {
+    pages: t('admin.pages'),
+    posts: t('admin.posts'),
+    trash: state.trash.length > 0 ? `${t('admin.trash')} (${state.trash.length})` : t('admin.trash'),
+    users: t('admin.users'),
+    launchpad: t('launchpad.title'),
+    feedback: t('admin.feedback'),
+  }
   const row = 'flex items-center gap-3 px-4 py-3 hover:bg-surface-2'
 
   return (
@@ -145,7 +174,7 @@ export function AdminPage() {
         }
       />
       <div className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
-        <div role="tablist" className="mb-4 flex gap-1 rounded-xl bg-surface-2 p-1">
+        <div role="tablist" className="mb-4 flex gap-1 overflow-x-auto rounded-xl bg-surface-2 p-1">
           {tabs.map((value) => (
             <button
               key={value}
@@ -153,14 +182,14 @@ export function AdminPage() {
               role="tab"
               aria-selected={tab === value}
               onClick={() => setTab(value)}
-              className={`flex-1 rounded-lg py-2 text-sm font-medium ${tab === value ? 'bg-surface text-primary shadow-card' : 'text-muted hover:text-text'}`}
+              className={`flex-1 shrink-0 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap ${tab === value ? 'bg-surface text-primary shadow-card' : 'text-muted hover:text-text'}`}
             >
               {label[value]}
             </button>
           ))}
         </div>
 
-        {tab !== 'feedback' && (
+        {(tab === 'pages' || tab === 'posts') && (
           <label className="relative mb-4 block">
             <span className="sr-only">{t('admin.search')}</span>
             <Search className="pointer-events-none absolute top-1/2 left-3 size-5 -translate-y-1/2 text-muted" aria-hidden="true" />
@@ -232,6 +261,10 @@ export function AdminPage() {
                 ))}
             </ul>
           )}
+
+          {tab === 'trash' && <TrashPanel />}
+          {tab === 'users' && <UsersPanel />}
+          {tab === 'launchpad' && <LaunchpadPanel />}
 
           {tab === 'feedback' &&
             (state.feedback.length === 0 ? (

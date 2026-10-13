@@ -27,3 +27,11 @@ describe('global search', () => {
     expect(search(state, 'welcome', 'nl').posts).toHaveLength(0)
   })
 })
+
+describe('launchpad search', () => {
+  it('finds tools by their name in any language', () => {
+    const state = buildSeedState(Date.UTC(2026, 0, 1))
+    expect(search(state, 'declaraties', 'nl').tools.map((t) => t.id)).toEqual(['lp-expenses'])
+    expect(search(state, 'expenses', 'nl').tools.map((t) => t.id)).toEqual(['lp-expenses'])
+  })
+})

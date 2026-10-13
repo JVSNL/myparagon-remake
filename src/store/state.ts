@@ -11,6 +11,10 @@ import type {
   PageSection,
   PostContent,
   ImageRef,
+  Block,
+  LaunchpadLink,
+  Role,
+  TrashItem,
   Location,
   Page,
   Post,
@@ -43,6 +47,10 @@ export interface AppState {
   /** Per user; missing means all notification types are on. */
   notificationPrefs: Record<string, NotificationPrefs>
   feedback: Feedback[]
+  /** Shortcuts to other tools, shown on Home; managed by admins. */
+  launchpad: LaunchpadLink[]
+  /** Deleted posts and pages, newest first. */
+  trash: TrashItem[]
 }
 
 export type ProfileChanges = Partial<
@@ -105,10 +113,16 @@ export type Action =
   | { type: 'discardPageDraft'; pageId: string }
   | { type: 'publishPage'; pageId: string; versionId: string; now: number }
   | { type: 'restorePageVersion'; pageId: string; versionId: string }
-  | { type: 'createPage'; id: string; slug: string; section: PageSection; title: string; now: number }
+  /** `blocks` comes from a page template; without it the page starts with a hero. */
+  | { type: 'createPage'; id: string; slug: string; section: PageSection; title: string; now: number; blocks?: Block[] }
+  | { type: 'deletePage'; pageId: string; trashId: string; now: number }
   | { type: 'updatePost'; postId: string; lang: Lang; content: PostContent; image?: ImageRef }
   | { type: 'removePostTranslation'; postId: string; lang: Lang }
-  | { type: 'deletePost'; postId: string }
+  | { type: 'deletePost'; postId: string; trashId: string; now: number }
+  | { type: 'restoreFromTrash'; trashId: string }
+  | { type: 'purgeFromTrash'; trashId: string }
+  | { type: 'setUserRole'; userId: string; role: Role }
+  | { type: 'saveLaunchpad'; links: LaunchpadLink[] }
   | { type: 'setNotificationPrefs'; prefs: NotificationPrefs }
   | { type: 'sendFeedback'; id: string; topic: Feedback['topic']; text: string; now: number }
   | { type: 'reset'; state: AppState }

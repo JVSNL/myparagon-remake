@@ -302,7 +302,7 @@ describe('comment languages', () => {
   })
 
   it('deletes a post with its comments', () => {
-    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'deletePost', postId: 'p01' })
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'deletePost', postId: 'p01', trashId: 'tr1', now: NOW })
     expect(state.posts.some((p) => p.id === 'p01')).toBe(false)
     expect(state.comments.some((c) => c.postId === 'p01')).toBe(false)
   })
@@ -346,5 +346,71 @@ describe('publishing', () => {
     const notified = state.notifications.filter((n) => n.postId === 'new')
     expect(notified).toHaveLength(59)
     expect(notified.some((n) => n.userId === DEMO_ACCOUNTS.editor)).toBe(false)
+  })
+})
+
+describe('trash', () => {
+  it('moves a deleted post with its comments to the trash and restores it', () => {
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    const comments = editor.comments.filter((c) => c.postId === 'p01').length
+    let state = run(editor, { type: 'deletePost', postId: 'p01', trashId: 'tr1', now: NOW })
+    expect(state.trash).toHaveLength(1)
+    expect(state.trash[0]).toMatchObject({ kind: 'post', deletedBy: DEMO_ACCOUNTS.editor })
+    state = run(state, { type: 'restoreFromTrash', trashId: 'tr1' })
+    expect(state.trash).toHaveLength(0)
+    expect(state.posts.some((p) => p.id === 'p01')).toBe(true)
+    expect(state.comments.filter((c) => c.postId === 'p01')).toHaveLength(comments)
+  })
+
+  it('restores a page only while its address is free, and purges for good', () => {
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    const page = editor.pages[0]
+    let state = run(editor, { type: 'deletePage', pageId: page.id, trashId: 'tr2', now: NOW })
+    expect(state.pages.some((p) => p.id === page.id)).toBe(false)
+    const taken = run(state, { type: 'createPage', id: 'pg-x', slug: page.slug, section: 'story', title: 'Bezet', now: NOW })
+    expect(run(taken, { type: 'restoreFromTrash', trashId: 'tr2' })).toBe(taken)
+    expect(run(state, { type: 'restoreFromTrash', trashId: 'tr2' }).pages.some((p) => p.id === page.id)).toBe(true)
+    expect(run(state, { type: 'purgeFromTrash', trashId: 'tr2' }).trash).toHaveLength(0)
+  })
+
+  it('is off limits for employees', () => {
+    const state = signedIn()
+    expect(run(state, { type: 'deletePage', pageId: state.pages[0].id, trashId: 'x', now: NOW })).toBe(state)
+  })
+})
+
+describe('page templates', () => {
+  it('creates a page with the blocks of a template', () => {
+    const blocks = [{ id: 'pg-t-b1', type: 'heading' as const, text: 'Hallo' }]
+    const state = run(signedIn(DEMO_ACCOUNTS.editor), { type: 'createPage', id: 'pg-t', slug: 'sjabloon', section: 'story', title: 'Sjabloon', now: NOW, blocks })
+    expect(state.pages.find((p) => p.id === 'pg-t')?.blocks.nl).toEqual(blocks)
+  })
+})
+
+describe('roles', () => {
+  it('lets admins change roles of others, never their own', () => {
+    const admin = signedIn(DEMO_ACCOUNTS.admin)
+    const changed = run(admin, { type: 'setUserRole', userId: DEMO_ACCOUNTS.employee, role: 'editor' })
+    expect(changed.users.find((u) => u.id === DEMO_ACCOUNTS.employee)?.role).toBe('editor')
+    expect(run(admin, { type: 'setUserRole', userId: DEMO_ACCOUNTS.admin, role: 'employee' })).toBe(admin)
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    expect(run(editor, { type: 'setUserRole', userId: DEMO_ACCOUNTS.employee, role: 'admin' })).toBe(editor)
+  })
+})
+
+describe('launchpad', () => {
+  it('saves valid tiles for admins only', () => {
+    const admin = signedIn(DEMO_ACCOUNTS.admin)
+    const links = [
+      { id: 'a', label: { nl: ' Rooster ' }, url: 'https://example.com', icon: 'clock', color: 'navy' as const },
+      { id: 'b', label: { nl: '' }, url: 'https://example.com', icon: 'clock', color: 'navy' as const },
+      { id: 'c', label: { nl: 'Fout' }, url: 'javascript:alert(1)', icon: 'clock', color: 'navy' as const },
+      { id: 'd', label: { nl: 'Intern' }, url: '/pages/faq', icon: 'clock', color: 'navy' as const },
+    ]
+    const saved = run(admin, { type: 'saveLaunchpad', links })
+    expect(saved.launchpad.map((l) => l.id)).toEqual(['a', 'd'])
+    expect(saved.launchpad[0].label.nl).toBe('Rooster')
+    const editor = signedIn(DEMO_ACCOUNTS.editor)
+    expect(run(editor, { type: 'saveLaunchpad', links })).toBe(editor)
   })
 })
