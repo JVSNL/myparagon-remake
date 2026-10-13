@@ -44,6 +44,8 @@ the app is *myNexora*. Never put real names, photos, logos or texts from the ori
 - Posts and comments carry their `lang`; show them through `usePostContent` / `useTranslated` so readers
   get stored or machine translations (`src/lib/translate.ts`). New seed posts/comments need EN and DE
   versions in `src/data/seed/translations.ts` (a test checks this).
+- Built-but-parked features are switched off in `src/lib/features.ts` (currently the launchpad); keep
+  their code and tests working so they can be switched on again.
 - Deleting posts or pages moves them to `state.trash`; restore goes through `restoreFromTrash`. Role changes
   and the launchpad are admin-only (`isAdmin`), and admins cannot change their own role.
 - Show news through `visiblePosts` / `canSeePost` (audience by region, scheduled posts have a future

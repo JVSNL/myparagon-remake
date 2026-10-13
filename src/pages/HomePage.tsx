@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { PageHeader } from '../components/layout/PageHeader'
 import { HomeGreeting } from '../components/HomeGreeting'
 import { Launchpad } from '../components/Launchpad'
+import { FEATURES } from '../lib/features'
 import { PostCard } from '../components/PostCard'
 import { useT } from '../lib/preferences'
 import { canPublish } from '../store/permissions'
@@ -40,7 +41,7 @@ export function HomePage() {
       />
       <div className="mx-auto max-w-2xl px-4 pt-4 lg:pt-0">
         <HomeGreeting />
-        <Launchpad />
+        {FEATURES.launchpad && <Launchpad />}
         {posts.length === 0 ? (
           <p className="py-16 text-center text-muted">{t('feed.empty')}</p>
         ) : (

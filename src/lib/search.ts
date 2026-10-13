@@ -1,6 +1,7 @@
 import type { Block, Lang, LaunchpadLink, Location, Page, Post, User } from '../data/types'
 import { canSeePost, fullName, postContent } from '../store/selectors'
 import type { AppState } from '../store/state'
+import { FEATURES } from './features'
 import { pick } from './localized'
 
 export const normalize = (s: string) =>
@@ -103,7 +104,7 @@ export function search(state: AppState, query: string, lang: Lang, viewer?: { us
       .map((item) => ({ page, question: item.question, answer: item.answer })),
   )
 
-  const tools = state.launchpad.filter((l) => matches(Object.values(l.label).join(' ')))
+  const tools = (FEATURES.launchpad ? state.launchpad : []).filter((l) => matches(Object.values(l.label).join(' ')))
 
   const results = {
     posts: posts.slice(0, LIMIT),
