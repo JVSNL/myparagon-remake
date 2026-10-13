@@ -4,7 +4,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import type { ColorKey } from '../../data/types'
 import { COLOR_CLASSES } from '../../lib/colors'
 import { useT } from '../../lib/preferences'
-import { LogoMark } from '../Logo'
+import { DemoBadge, LogoMark } from '../Logo'
 import { NotificationBell } from './NotificationBell'
 import { sectionColor } from './navItems'
 
@@ -54,8 +54,9 @@ export function PageHeader({ title, backTo, actions, showLogo, color }: Props) {
                 {t('nav.back')}
               </button>
             ) : showLogo ? (
-              <Link to="/" className="p-1 lg:hidden" aria-label="myNexora">
+              <Link to="/" className="flex items-center gap-1.5 p-1 lg:hidden" aria-label={`myNexora (${t('app.demo')})`}>
                 <LogoMark inverse className="size-8" />
+                <DemoBadge inverse />
               </Link>
             ) : null}
           </div>

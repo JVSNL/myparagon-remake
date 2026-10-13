@@ -413,6 +413,7 @@ export const en: Record<MessageKey, string> = {
   'role.employee': 'Employee',
   'role.editor': 'Editor',
   'role.admin': 'Administrator',
+  'app.demo': "Demo",
   'tool.back': "Back to Home",
   'tool.demo': "This is a demo with fictional data.",
   'tool.body': "The link to {name} still has to be built. Later this tile will open the application you use for it.",

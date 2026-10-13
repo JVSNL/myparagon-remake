@@ -413,6 +413,7 @@ export const de: Record<MessageKey, string> = {
   'role.employee': 'Mitarbeitende',
   'role.editor': 'Redaktion',
   'role.admin': 'Administration',
+  'app.demo': "Demo",
   'tool.back': "Zurück zur Startseite",
   'tool.demo': "Dies ist eine Demo mit fiktiven Daten.",
   'tool.body': "Die Verbindung zu {name} muss noch gebaut werden. Später öffnet diese Kachel direkt die Anwendung, die ihr dafür nutzt.",
